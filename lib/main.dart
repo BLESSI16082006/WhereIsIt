@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 
+import 'core/routes/app_routes.dart';
 import 'firebase_options.dart';
-import 'screens/authentication/login_screen.dart';
-import 'screens/authentication/register_screen.dart';
-import 'screens/authentication/admin_login_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,25 +21,26 @@ class WhereIsItApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'WhereIsIt',
+
       debugShowCheckedModeBanner: false,
 
-      title: 'WhereIsIt',
+      // --------------------------------------------------------
+      // THEME
+      // --------------------------------------------------------
 
       theme: ThemeData(
         useMaterial3: true,
 
-        // Main app theme
-        brightness: Brightness.light,
-
-        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
-
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF008B95),
+          seedColor: const Color(0xFF008C95),
           brightness: Brightness.light,
         ),
 
+        scaffoldBackgroundColor: const Color(0xFFF7F8FA),
+
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.black,
+          backgroundColor: Color(0xFF008C95),
           foregroundColor: Colors.white,
           elevation: 0,
           centerTitle: false,
@@ -53,14 +52,16 @@ class WhereIsItApp extends StatelessWidget {
 
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(
-              Radius.circular(16),
+              Radius.circular(14),
             ),
-            borderSide: BorderSide.none,
+            borderSide: BorderSide(
+              color: Color(0xFFE0E0E0),
+            ),
           ),
 
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(
-              Radius.circular(16),
+              Radius.circular(14),
             ),
             borderSide: BorderSide(
               color: Color(0xFFE0E0E0),
@@ -69,10 +70,10 @@ class WhereIsItApp extends StatelessWidget {
 
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(
-              Radius.circular(16),
+              Radius.circular(14),
             ),
             borderSide: BorderSide(
-              color: Color(0xFF008B95),
+              color: Color(0xFF008C95),
               width: 2,
             ),
           ),
@@ -80,23 +81,30 @@ class WhereIsItApp extends StatelessWidget {
 
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF008B95),
+            backgroundColor: const Color(0xFF008C95),
             foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 55),
+            minimumSize: const Size(
+              double.infinity,
+              52,
+            ),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
             ),
           ),
         ),
       ),
 
-      // First screen
-      home: const LoginScreen(),
-        routes: {
-          '/login': (context) => const LoginScreen(),
-          '/register': (context) => const RegisterScreen(),
-          '/admin-login': (context) => const AdminLoginScreen(),
-        },
+      // --------------------------------------------------------
+      // INITIAL SCREEN
+      // --------------------------------------------------------
+
+      initialRoute: AppRoutes.login,
+
+      // --------------------------------------------------------
+      // ROUTES
+      // --------------------------------------------------------
+
+      onGenerateRoute: AppRoutes.generateRoute,
     );
   }
 }
