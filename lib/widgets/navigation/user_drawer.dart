@@ -4,6 +4,13 @@ class UserDrawer extends StatelessWidget {
   const UserDrawer({super.key});
 
   // ------------------------------------------------------------
+  // CHOCOLATE BROWN
+  // ------------------------------------------------------------
+
+  static const Color _darkChocolate =
+      Color(0xFF2B1712);
+
+  // ------------------------------------------------------------
   // NAVIGATE
   // ------------------------------------------------------------
 
@@ -84,8 +91,8 @@ class UserDrawer extends StatelessWidget {
                 20,
                 24,
               ),
-              decoration: BoxDecoration(
-                color: Colors.teal.shade700,
+              decoration: const BoxDecoration(
+                color: _darkChocolate,
               ),
               child: Column(
                 crossAxisAlignment:
@@ -139,6 +146,10 @@ class UserDrawer extends StatelessWidget {
                   vertical: 10,
                 ),
                 children: [
+                  // ------------------------------------------------
+                  // HOME
+                  // ------------------------------------------------
+
                   ListTile(
                     leading: const Icon(
                       Icons.home_outlined,
@@ -148,6 +159,10 @@ class UserDrawer extends StatelessWidget {
                       Navigator.pop(context);
                     },
                   ),
+
+                  // ------------------------------------------------
+                  // MY ACCOUNT
+                  // ------------------------------------------------
 
                   ListTile(
                     leading: const Icon(
@@ -162,6 +177,10 @@ class UserDrawer extends StatelessWidget {
                     },
                   ),
 
+                  // ------------------------------------------------
+                  // LOST ITEMS
+                  // ------------------------------------------------
+
                   ListTile(
                     leading: const Icon(
                       Icons.search_off_outlined,
@@ -174,6 +193,10 @@ class UserDrawer extends StatelessWidget {
                       );
                     },
                   ),
+
+                  // ------------------------------------------------
+                  // FOUND ITEMS
+                  // ------------------------------------------------
 
                   ListTile(
                     leading: const Icon(
@@ -188,6 +211,10 @@ class UserDrawer extends StatelessWidget {
                     },
                   ),
 
+                  // ------------------------------------------------
+                  // MY ITEMS
+                  // ------------------------------------------------
+
                   ListTile(
                     leading: const Icon(
                       Icons.inventory_2_outlined,
@@ -200,6 +227,10 @@ class UserDrawer extends StatelessWidget {
                       );
                     },
                   ),
+
+                  // ------------------------------------------------
+                  // NOTIFICATIONS
+                  // ------------------------------------------------
 
                   ListTile(
                     leading: const Icon(
@@ -221,6 +252,10 @@ class UserDrawer extends StatelessWidget {
                   const Divider(
                     height: 24,
                   ),
+
+                  // ------------------------------------------------
+                  // ABOUT
+                  // ------------------------------------------------
 
                   ListTile(
                     leading: const Icon(

@@ -1,0 +1,786 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+
+import '../../services/recovery_service.dart';
+
+class RecoveryConfirmationScreen extends StatefulWidget {
+  final String recoveryId;
+
+  const RecoveryConfirmationScreen({
+    super.key,
+    required this.recoveryId,
+  });
+
+  @override
+  State<RecoveryConfirmationScreen> createState() =>
+      _RecoveryConfirmationScreenState();
+}
+
+class _RecoveryConfirmationScreenState
+    extends State<RecoveryConfirmationScreen> {
+  final RecoveryService _recoveryService = RecoveryService();
+
+  bool _isConfirming = false;
+
+  // ============================================================
+  // CONFIRM RECOVERY
+  // ============================================================
+
+  Future<void> _confirmRecovery({
+    required bool isOwner,
+  }) async {
+    final User? user =
+        FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      _showMessage(
+        'Please log in to continue.',
+        isError: true,
+      );
+      return;
+    }
+
+    final bool? confirmed =
+        await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Item Returned?',
+          ),
+          content: const Text(
+            'Please confirm that the item has '
+            'actually been returned/recovered. '
+            'This confirmation will be recorded.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(
+                  dialogContext,
+                  false,
+                );
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(
+                  dialogContext,
+                  true,
+                );
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    setState(() {
+      _isConfirming = true;
+    });
+
+    try {
+      if (isOwner) {
+        await _recoveryService.confirmByOwner(
+          widget.recoveryId,
+        );
+      } else {
+        await _recoveryService.confirmByFinder(
+          widget.recoveryId,
+        );
+      }
+
+      if (!mounted) {
+        return;
+      }
+
+      _showMessage(
+        'Your confirmation has been recorded.',
+      );
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      _showMessage(
+        'Unable to save your confirmation.',
+        isError: true,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isConfirming = false;
+        });
+      }
+    }
+  }
+
+  // ============================================================
+  // MESSAGE
+  // ============================================================
+
+  void _showMessage(
+    String message, {
+    bool isError = false,
+  }) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor:
+            isError ? Colors.red.shade700 : null,
+      ),
+    );
+  }
+
+  // ============================================================
+  // BUILD
+  // ============================================================
+
+  @override
+  Widget build(BuildContext context) {
+    final User? currentUser =
+        FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Recovery Confirmation',
+          ),
+        ),
+        body: _buildLoggedOutState(),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Recovery Confirmation',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: StreamBuilder<
+          QuerySnapshot<Map<String, dynamic>>>(
+        stream: FirebaseFirestore.instance
+            .collection('recoveries')
+            .where(
+              'recoveryId',
+              isEqualTo: widget.recoveryId,
+            )
+            .limit(1)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState ==
+              ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (snapshot.hasError) {
+            return _buildErrorState();
+          }
+
+          final docs =
+              snapshot.data?.docs ?? [];
+
+          if (docs.isEmpty) {
+            return _buildNotFoundState();
+          }
+
+          final Map<String, dynamic> recovery =
+              docs.first.data();
+
+          return _buildRecoveryContent(
+            recovery,
+            currentUser.uid,
+          );
+        },
+      ),
+    );
+  }
+
+  // ============================================================
+  // RECOVERY CONTENT
+  // ============================================================
+
+  Widget _buildRecoveryContent(
+    Map<String, dynamic> recovery,
+    String currentUserId,
+  ) {
+    final String status =
+        recovery['status']?.toString() ??
+            'pending';
+
+    final String ownerId =
+        recovery['ownerId']?.toString() ?? '';
+
+    final String finderId =
+        recovery['finderId']?.toString() ?? '';
+
+    final bool isOwner =
+        currentUserId == ownerId;
+
+    final bool isFinder =
+        currentUserId == finderId;
+
+    final bool ownerConfirmed =
+        recovery['ownerConfirmed'] == true;
+
+    final bool finderConfirmed =
+        recovery['finderConfirmed'] == true;
+
+    final bool isCompleted =
+        status == 'completed';
+
+    final String recoveryId =
+        recovery['recoveryId']?.toString() ??
+            widget.recoveryId;
+
+    return FutureBuilder<
+        DocumentSnapshot<Map<String, dynamic>>>(
+      future: _getPostDetails(recovery),
+      builder: (context, postSnapshot) {
+        if (postSnapshot.connectionState ==
+            ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        final postData =
+            postSnapshot.data?.data();
+
+        final String itemName =
+            postData?['itemName']?.toString() ??
+                'Item';
+
+        final String category =
+            postData?['category']?.toString() ??
+                '';
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
+            children: [
+              _buildHeader(
+                isCompleted,
+              ),
+
+              const SizedBox(height: 22),
+
+              _buildItemCard(
+                itemName,
+                category,
+                postData,
+              ),
+
+              const SizedBox(height: 24),
+
+              _buildConfirmationStatus(
+                ownerConfirmed,
+                finderConfirmed,
+              ),
+
+              const SizedBox(height: 24),
+
+              if (isCompleted)
+                _buildCompletedCard()
+              else if (isOwner)
+                _buildConfirmationButton(
+                  title: ownerConfirmed
+                      ? 'You Have Confirmed'
+                      : 'Confirm Item Returned',
+                  subtitle: ownerConfirmed
+                      ? 'Waiting for the finder to confirm.'
+                      : 'Confirm after receiving your item.',
+                  icon: ownerConfirmed
+                      ? Icons.check_circle
+                      : Icons.assignment_turned_in_outlined,
+                  enabled: !ownerConfirmed,
+                  onPressed: () {
+                    _confirmRecovery(
+                      isOwner: true,
+                    );
+                  },
+                )
+              else if (isFinder)
+                _buildConfirmationButton(
+                  title: finderConfirmed
+                      ? 'You Have Confirmed'
+                      : 'Confirm Item Returned',
+                  subtitle: finderConfirmed
+                      ? 'Waiting for the owner to confirm.'
+                      : 'Confirm after returning the item.',
+                  icon: finderConfirmed
+                      ? Icons.check_circle
+                      : Icons.assignment_turned_in_outlined,
+                  enabled: !finderConfirmed,
+                  onPressed: () {
+                    _confirmRecovery(
+                      isOwner: false,
+                    );
+                  },
+                )
+              else
+                _buildUnauthorizedCard(),
+
+              const SizedBox(height: 24),
+
+              Text(
+                'Recovery ID: $recoveryId',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade500,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ============================================================
+  // GET POST DETAILS
+  // ============================================================
+
+  Future<
+      DocumentSnapshot<Map<String, dynamic>>>
+      _getPostDetails(
+    Map<String, dynamic> recovery,
+  ) async {
+    final String lostPostId =
+        recovery['lostPostId']?.toString() ?? '';
+
+    final String foundPostId =
+        recovery['foundPostId']?.toString() ?? '';
+
+    final String postId =
+        lostPostId.isNotEmpty
+            ? lostPostId
+            : foundPostId;
+
+    if (postId.isEmpty) {
+      throw Exception(
+        'Post ID is missing.',
+      );
+    }
+
+    return FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .get();
+  }
+
+  // ============================================================
+  // HEADER
+  // ============================================================
+
+  Widget _buildHeader(bool isCompleted) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isCompleted
+              ? [
+                  Colors.green.shade50,
+                  Colors.green.shade100,
+                ]
+              : [
+                  Colors.teal.shade50,
+                  Colors.blue.shade50,
+                ],
+        ),
+        borderRadius:
+            BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            isCompleted
+                ? Icons.check_circle
+                : Icons.sync_alt_rounded,
+            size: 58,
+            color: isCompleted
+                ? Colors.green.shade600
+                : Colors.teal.shade600,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            isCompleted
+                ? 'Recovery Completed'
+                : 'Item Return Confirmation',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 21,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            isCompleted
+                ? 'Both parties have confirmed the recovery.'
+                : 'Both parties must confirm before the recovery is completed.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey.shade700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // ITEM CARD
+  // ============================================================
+
+  Widget _buildItemCard(
+    String itemName,
+    String category,
+    Map<String, dynamic>? post,
+  ) {
+    final String location =
+        post?['location']?.toString() ?? '';
+
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.circular(18),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Item',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              itemName,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (category.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                category,
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
+            if (location.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Icon(
+                    Icons.location_on_outlined,
+                    size: 18,
+                    color: Colors.grey.shade600,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    location,
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // CONFIRMATION STATUS
+  // ============================================================
+
+  Widget _buildConfirmationStatus(
+    bool ownerConfirmed,
+    bool finderConfirmed,
+  ) {
+    return Column(
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Confirmation Status',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        _buildStatusRow(
+          'Lost Item Owner',
+          ownerConfirmed,
+        ),
+        const SizedBox(height: 10),
+        _buildStatusRow(
+          'Finder',
+          finderConfirmed,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusRow(
+    String title,
+    bool confirmed,
+  ) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: confirmed
+            ? Colors.green.shade50
+            : Colors.orange.shade50,
+        borderRadius:
+            BorderRadius.circular(14),
+        border: Border.all(
+          color: confirmed
+              ? Colors.green.shade200
+              : Colors.orange.shade200,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            confirmed
+                ? Icons.check_circle
+                : Icons.pending_outlined,
+            color: confirmed
+                ? Colors.green.shade600
+                : Colors.orange.shade600,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Text(
+            confirmed
+                ? 'Confirmed'
+                : 'Pending',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: confirmed
+                  ? Colors.green.shade700
+                  : Colors.orange.shade700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // CONFIRM BUTTON
+  // ============================================================
+
+  Widget _buildConfirmationButton({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required bool enabled,
+    required VoidCallback onPressed,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed:
+            enabled && !_isConfirming
+                ? onPressed
+                : null,
+        icon: _isConfirming
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child:
+                    CircularProgressIndicator(
+                  strokeWidth: 2,
+                ),
+              )
+            : Icon(icon),
+        label: Padding(
+          padding:
+              const EdgeInsets.symmetric(
+            vertical: 12,
+          ),
+          child: Column(
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                subtitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // COMPLETED CARD
+  // ============================================================
+
+  Widget _buildCompletedCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.green.shade50,
+        borderRadius:
+            BorderRadius.circular(18),
+        border: Border.all(
+          color: Colors.green.shade200,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.verified_rounded,
+            size: 34,
+            color: Colors.green.shade600,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              'The item recovery has been confirmed by both parties.',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.green.shade800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // UNAUTHORIZED
+  // ============================================================
+
+  Widget _buildUnauthorizedCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius:
+            BorderRadius.circular(18),
+      ),
+      child: const Text(
+        'You are not one of the users involved in this recovery request.',
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  // ============================================================
+  // LOGGED OUT
+  // ============================================================
+
+  Widget _buildLoggedOutState() {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(30),
+        child: Text(
+          'Please log in to view this recovery request.',
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // NOT FOUND
+  // ============================================================
+
+  Widget _buildNotFoundState() {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(30),
+        child: Text(
+          'Recovery request not found.',
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // ERROR
+  // ============================================================
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(30),
+        child: Column(
+          mainAxisAlignment:
+              MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 60,
+              color: Colors.red.shade400,
+            ),
+            const SizedBox(height: 14),
+            const Text(
+              'Unable to load recovery request.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

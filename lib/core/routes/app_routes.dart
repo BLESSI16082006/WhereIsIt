@@ -1,3 +1,6 @@
+import '../../screens/items/create_post_screen.dart';
+import '../../screens/items/my_items_screen.dart';
+import '../../screens/items/found_items_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../screens/authentication/admin_login_screen.dart';
@@ -9,10 +12,15 @@ import '../../screens/home/search_filter_screen.dart';
 
 import '../../screens/user/my_account_screen.dart';
 import '../../screens/user/about_screen.dart';
+import '../../screens/user/notifications_screen.dart';
+
+import '../../screens/items/lost_items_screen.dart';
+
+import '../../screens/items/post_details_screen.dart';
 
 class AppRoutes {
   // ------------------------------------------------------------
-  // ROUTE NAMES
+  // AUTHENTICATION
   // ------------------------------------------------------------
 
   static const String login = '/login';
@@ -20,23 +28,24 @@ class AppRoutes {
   static const String adminLogin = '/admin-login';
 
   // ------------------------------------------------------------
-  // MODULE 2 - USER ACCESS / HOME
+  // MODULE 2 - HOME / USER
   // ------------------------------------------------------------
 
   static const String home = '/home';
   static const String account = '/account';
   static const String about = '/about';
-  static const String searchFilter = '/search-filter';
+  static const String notifications = '/notifications';
 
   // ------------------------------------------------------------
-  // FUTURE MODULES
+  // MODULE 3 - ITEMS
   // ------------------------------------------------------------
 
   static const String lostItems = '/lost-items';
   static const String foundItems = '/found-items';
   static const String myItems = '/my-items';
   static const String createPost = '/create-post';
-
+  static const String searchFilter = '/search-filter';
+  static const String postDetails = '/post-details';
   // ------------------------------------------------------------
   // ROUTE GENERATOR
   // ------------------------------------------------------------
@@ -45,9 +54,9 @@ class AppRoutes {
     RouteSettings settings,
   ) {
     switch (settings.name) {
-      // ==========================================================
+      // ----------------------------------------------------------
       // AUTHENTICATION
-      // ==========================================================
+      // ----------------------------------------------------------
 
       case login:
         return MaterialPageRoute(
@@ -64,14 +73,18 @@ class AppRoutes {
           builder: (_) => const AdminLoginScreen(),
         );
 
-      // ==========================================================
-      // MODULE 2 - USER ACCESS / HOME
-      // ==========================================================
+      // ----------------------------------------------------------
+      // HOME
+      // ----------------------------------------------------------
 
       case home:
         return MaterialPageRoute(
           builder: (_) => const HomeScreen(),
         );
+
+      // ----------------------------------------------------------
+      // USER
+      // ----------------------------------------------------------
 
       case account:
         return MaterialPageRoute(
@@ -83,24 +96,60 @@ class AppRoutes {
           builder: (_) => const AboutScreen(),
         );
 
+      case notifications:
+        return MaterialPageRoute(
+          builder: (_) => const NotificationsScreen(),
+        );
+
+      // ----------------------------------------------------------
+      // LOST ITEMS
+      // ----------------------------------------------------------
+
+      case lostItems:
+        return MaterialPageRoute(
+          builder: (_) => LostItemsScreen(),
+        );
+
+      // ----------------------------------------------------------
+      // SEARCH FILTER
+      // ----------------------------------------------------------
+
       case searchFilter:
         return MaterialPageRoute(
           builder: (_) => const SearchFilterScreen(),
         );
 
-      // ==========================================================
-      // FUTURE MODULES
-      // ==========================================================
+      // ----------------------------------------------------------
+      // FUTURE ROUTES
+      // ----------------------------------------------------------
 
-      case lostItems:
       case foundItems:
-      case myItems:
-      case createPost:
-        return _notImplementedRoute(settings.name);
+        return MaterialPageRoute(
+          builder: (_) => FoundItemsScreen(),
+        );
 
-      // ==========================================================
+      case myItems:
+        return MaterialPageRoute(
+          builder: (_) => MyItemsScreen(),
+        );
+
+      case createPost:
+        return MaterialPageRoute(
+          builder: (_) => const CreatePostScreen(),
+        );
+
+      case postDetails:
+        final post = settings.arguments as Map<String, dynamic>;
+      
+        return MaterialPageRoute(
+          builder: (_) => PostDetailsScreen(
+            post: post,
+          ),
+        );
+
+      // ----------------------------------------------------------
       // UNKNOWN ROUTE
-      // ==========================================================
+      // ----------------------------------------------------------
 
       default:
         return _errorRoute(
@@ -110,7 +159,7 @@ class AppRoutes {
   }
 
   // ------------------------------------------------------------
-  // FUTURE MODULE PLACEHOLDER
+  // COMING SOON
   // ------------------------------------------------------------
 
   static Route<dynamic> _notImplementedRoute(
@@ -136,7 +185,7 @@ class AppRoutes {
   }
 
   // ------------------------------------------------------------
-  // UNKNOWN ROUTE SCREEN
+  // ERROR ROUTE
   // ------------------------------------------------------------
 
   static Route<dynamic> _errorRoute(

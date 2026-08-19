@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/routes/app_routes.dart';
 import '../../widgets/common/app_search_bar.dart';
 import '../../widgets/common/recent_post_card.dart';
 import '../../widgets/navigation/user_drawer.dart';
@@ -69,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _openSearchFilter() async {
     final result = await Navigator.pushNamed(
       context,
-      '/search-filter',
+      AppRoutes.searchFilter,
     );
 
     if (!mounted) return;
@@ -97,6 +98,39 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     }
+  }
+
+  // ------------------------------------------------------------
+  // OPEN LOST ITEMS
+  // ------------------------------------------------------------
+
+  void _openLostItems() {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.lostItems,
+    );
+  }
+
+  // ------------------------------------------------------------
+  // OPEN FOUND ITEMS
+  // ------------------------------------------------------------
+
+  void _openFoundItems() {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.foundItems,
+    );
+  }
+
+  // ------------------------------------------------------------
+  // OPEN CREATE POST
+  // ------------------------------------------------------------
+
+  void _openCreatePost() {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.createPost,
+    );
   }
 
   // ------------------------------------------------------------
@@ -201,12 +235,11 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 14),
 
               // ------------------------------------------------
-              // SEARCH FILTER + CREATE POST
+              // FILTER + CREATE POST
               // ------------------------------------------------
 
               Row(
                 children: [
-                  // FILTER BUTTON
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: _openSearchFilter,
@@ -219,20 +252,91 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   const SizedBox(width: 12),
 
-                  // CREATE POST BUTTON
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Create Post will be connected in the Lost/Found module.',
-                            ),
+                      onPressed: _openCreatePost,
+                      icon: const Icon(
+                        Icons.add,
+                      ),
+                      label: const Text(
+                        'Create Post',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 18),
+
+              // ------------------------------------------------
+              // LOST / FOUND QUICK ACCESS
+              // ------------------------------------------------
+
+              Row(
+                children: [
+                  Expanded(
+                    child: Card(
+                      margin: EdgeInsets.zero,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: _openLostItems,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 10,
                           ),
-                        );
-                      },
-                      icon: const Icon(Icons.add),
-                      label: const Text('Create Post'),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.search_off_rounded,
+                                size: 30,
+                                color: Colors.orange.shade700,
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Lost Items',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  Expanded(
+                    child: Card(
+                      margin: EdgeInsets.zero,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: _openFoundItems,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 10,
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.check_circle_outline,
+                                size: 30,
+                                color: Colors.green.shade700,
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Found Items',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -323,7 +427,9 @@ class _HomeScreenState extends State<HomeScreen> {
             size: 52,
             color: Colors.grey.shade500,
           ),
+
           const SizedBox(height: 14),
+
           const Text(
             'No posts found',
             style: TextStyle(
@@ -331,7 +437,9 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
+
           const SizedBox(height: 6),
+
           Text(
             'Try searching with another item name or keyword.',
             textAlign: TextAlign.center,
