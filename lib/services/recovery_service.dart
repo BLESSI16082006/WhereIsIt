@@ -5,7 +5,7 @@ class RecoveryService {
       FirebaseFirestore.instance;
 
   // ============================================================
-  // COLLECTION
+  // COLLECTIONS
   // ============================================================
 
   CollectionReference<Map<String, dynamic>> get _recoveries =>
@@ -24,7 +24,18 @@ class RecoveryService {
     required String ownerId,
     required String finderId,
   }) async {
-    final recoveryRef = _recoveries.doc();
+    // Prevent duplicate recovery requests.
+    final existing = await getRecoveryByPosts(
+      lostPostId: lostPostId,
+      foundPostId: foundPostId,
+    );
+
+    if (existing.docs.isNotEmpty) {
+      return existing.docs.first.id;
+    }
+
+    final DocumentReference<Map<String, dynamic>> recoveryRef =
+        _recoveries.doc();
 
     final Map<String, dynamic> recoveryData = {
       'recoveryId': recoveryRef.id,
@@ -68,8 +79,14 @@ class RecoveryService {
     required String foundPostId,
   }) async {
     return _recoveries
-        .where('lostPostId', isEqualTo: lostPostId)
-        .where('foundPostId', isEqualTo: foundPostId)
+        .where(
+          'lostPostId',
+          isEqualTo: lostPostId,
+        )
+        .where(
+          'foundPostId',
+          isEqualTo: foundPostId,
+        )
         .limit(1)
         .get();
   }
@@ -111,7 +128,8 @@ class RecoveryService {
   Future<void> _checkAndCompleteRecovery(
     String recoveryId,
   ) async {
-    final DocumentSnapshot<Map<String, dynamic>> recoverySnapshot =
+    final DocumentSnapshot<Map<String, dynamic>>
+        recoverySnapshot =
         await _recoveries.doc(recoveryId).get();
 
     if (!recoverySnapshot.exists) {
@@ -131,7 +149,13 @@ class RecoveryService {
     final bool finderConfirmed =
         data['finderConfirmed'] == true;
 
+    // Both users must confirm.
     if (!ownerConfirmed || !finderConfirmed) {
+      return;
+    }
+
+    // Prevent completing an already completed recovery.
+    if (data['status'] == 'completed') {
       return;
     }
 
@@ -141,18 +165,24 @@ class RecoveryService {
     final String foundPostId =
         data['foundPostId']?.toString() ?? '';
 
-    await _recoveries.doc(recoveryId).update({
-      'status': 'completed',
-      'completedAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
-
     // ----------------------------------------------------------
-    // Mark both posts as completed.
+    // Update recovery
     // ----------------------------------------------------------
 
-    final WriteBatch batch =
-        _firestore.batch();
+    final WriteBatch batch = _firestore.batch();
+
+    batch.update(
+      _recoveries.doc(recoveryId),
+      {
+        'status': 'completed',
+        'completedAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+    );
+
+    // ----------------------------------------------------------
+    // Mark LOST post completed
+    // ----------------------------------------------------------
 
     if (lostPostId.isNotEmpty) {
       batch.update(
@@ -165,6 +195,10 @@ class RecoveryService {
         },
       );
     }
+
+    // ----------------------------------------------------------
+    // Mark FOUND post completed
+    // ----------------------------------------------------------
 
     if (foundPostId.isNotEmpty) {
       batch.update(
@@ -192,8 +226,14 @@ class RecoveryService {
     return _recoveries
         .where(
           Filter.or(
-            Filter('ownerId', isEqualTo: userId),
-            Filter('finderId', isEqualTo: userId),
+            Filter(
+              'ownerId',
+              isEqualTo: userId,
+            ),
+            Filter(
+              'finderId',
+              isEqualTo: userId,
+            ),
           ),
         )
         .orderBy(
@@ -214,8 +254,14 @@ class RecoveryService {
     return _recoveries
         .where(
           Filter.or(
-            Filter('ownerId', isEqualTo: userId),
-            Filter('finderId', isEqualTo: userId),
+            Filter(
+              'ownerId',
+              isEqualTo: userId,
+            ),
+            Filter(
+              'finderId',
+              isEqualTo: userId,
+            ),
           ),
         )
         .where(
@@ -240,8 +286,14 @@ class RecoveryService {
     return _recoveries
         .where(
           Filter.or(
-            Filter('ownerId', isEqualTo: userId),
-            Filter('finderId', isEqualTo: userId),
+            Filter(
+              'ownerId',
+              isEqualTo: userId,
+            ),
+            Filter(
+              'finderId',
+              isEqualTo: userId,
+            ),
           ),
         )
         .where(
