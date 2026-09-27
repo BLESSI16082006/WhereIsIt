@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/routes/app_routes.dart';
 import '../../widgets/common/app_search_bar.dart';
 import '../../widgets/common/recent_post_card.dart';
 import '../../widgets/navigation/user_drawer.dart';
+import '../items/post_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,52 +17,155 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
-
-  // Temporary sample posts.
-  // Firestore posts will be connected later.
-  final List<Map<String, String>> _recentPosts = [
-    {
-      'itemName': 'Gold Ring',
-      'category': 'Valuable Items',
-      'postType': 'Lost',
-      'location': 'Nagercoil',
-      'description':
-          'Gold ring with a small engraved mark and unique design.',
-    },
-    {
-      'itemName': 'Aadhaar Card',
-      'category': 'Identity Documents',
-      'postType': 'Found',
-      'location': 'Marthandam',
-      'description':
-          'Identity document found near the main road.',
-    },
-    {
-      'itemName': 'Black Backpack',
-      'category': 'General Items',
-      'postType': 'Lost',
-      'location': 'Thuckalay',
-      'description':
-          'Black backpack containing books and personal belongings.',
-    },
-  ];
+  String _selectedLocation = '';
 
   // ------------------------------------------------------------
-  // SEARCH POSTS
+  // FIRESTORE POSTS
+  //
+  // No where() + orderBy() query is used here.
+  // This avoids the Firestore composite-index requirement.
   // ------------------------------------------------------------
 
-  List<Map<String, String>> get _filteredPosts {
-    if (_searchQuery.trim().isEmpty) {
-      return _recentPosts;
-    }
+  Stream<QuerySnapshot<Map<String, dynamic>>> _getRecentPosts() {
+    return FirebaseFirestore.instance
+        .collection('posts')
+        .snapshots();
+  }
 
-    final query = _searchQuery.trim().toLowerCase();
+  // ------------------------------------------------------------
+  // PREPARE RECENT ACTIVE POSTS
+  //
+  // Filtering and sorting are done in Dart instead of Firestore.
+  // ------------------------------------------------------------
 
-    return _recentPosts.where((post) {
-      return post['itemName']!.toLowerCase().contains(query) ||
-          post['category']!.toLowerCase().contains(query) ||
-          post['description']!.toLowerCase().contains(query) ||
-          post['location']!.toLowerCase().contains(query);
+  List<QueryDocumentSnapshot<Map<String, dynamic>>>
+      _getRecentActivePosts(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> allPosts,
+  ) {
+    // ----------------------------------------------------------
+    // ONLY ACTIVE POSTS
+    // ----------------------------------------------------------
+
+    final activePosts =
+        allPosts.where((doc) {
+      final Map<String, dynamic> post = doc.data();
+
+      return post['status']?.toString().toLowerCase() == 'active';
+    }).toList();
+
+    // ----------------------------------------------------------
+    // SORT BY CREATED DATE
+    //
+    // Newest posts appear first.
+    // Posts without createdAt are placed at the bottom.
+    // ----------------------------------------------------------
+
+    activePosts.sort((a, b) {
+      final dynamic valueA = a.data()['createdAt'];
+      final dynamic valueB = b.data()['createdAt'];
+
+      final Timestamp? dateA =
+          valueA is Timestamp ? valueA : null;
+
+      final Timestamp? dateB =
+          valueB is Timestamp ? valueB : null;
+
+      if (dateA == null && dateB == null) {
+        return 0;
+      }
+
+      if (dateA == null) {
+        return 1;
+      }
+
+      if (dateB == null) {
+        return -1;
+      }
+
+      return dateB.compareTo(dateA);
+    });
+
+    // ----------------------------------------------------------
+    // LATEST 20 POSTS
+    // ----------------------------------------------------------
+
+    return activePosts.take(20).toList();
+  }
+
+  // ------------------------------------------------------------
+  // SEARCH / FILTER
+  // ------------------------------------------------------------
+
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> _filterPosts(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> posts,
+  ) {
+    final String query =
+        _searchQuery.trim().toLowerCase();
+
+    final String location =
+        _selectedLocation.trim().toLowerCase();
+
+    final User? currentUser =
+        FirebaseAuth.instance.currentUser;
+
+    return posts.where((doc) {
+      final Map<String, dynamic> post = doc.data();
+
+      final String itemName =
+          post['itemName']?.toString().toLowerCase() ?? '';
+
+      final String category =
+          post['category']?.toString().toLowerCase() ?? '';
+
+      final String postLocation =
+          post['location']?.toString().toLowerCase() ?? '';
+
+      final String postUserId =
+          post['userId']?.toString() ?? '';
+
+      final bool isOwner =
+          currentUser != null &&
+          currentUser.uid == postUserId;
+
+      // --------------------------------------------------------
+      // VALUABLE ITEM PRIVACY
+      //
+      // Finder details for Found Valuable Items must not be
+      // searchable publicly through the private description.
+      // The owner can still search their own description.
+      // --------------------------------------------------------
+
+      final bool isPrivateFinderData =
+          post['isPrivateFinderData'] == true;
+
+      final String description =
+          (!isPrivateFinderData || isOwner)
+              ? post['description']
+                      ?.toString()
+                      .toLowerCase() ??
+                  ''
+              : '';
+
+      // --------------------------------------------------------
+      // KEYWORD SEARCH
+      // --------------------------------------------------------
+
+      final bool matchesKeyword =
+          query.isEmpty ||
+          itemName.contains(query) ||
+          category.contains(query) ||
+          description.contains(query) ||
+          postLocation.contains(query);
+
+      // --------------------------------------------------------
+      // LOCATION FILTER
+      // --------------------------------------------------------
+
+      final bool matchesLocation =
+          location.isEmpty ||
+          postLocation == location;
+
+      return matchesKeyword && matchesLocation;
     }).toList();
   }
 
@@ -73,19 +179,20 @@ class _HomeScreenState extends State<HomeScreen> {
       AppRoutes.searchFilter,
     );
 
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     if (result != null && result is Map) {
-      final keyword =
+      final String keyword =
           result['keyword']?.toString().trim() ?? '';
 
-      final location =
+      final String location =
           result['location']?.toString().trim() ?? '';
 
       setState(() {
-        if (keyword.isNotEmpty) {
-          _searchQuery = keyword;
-        }
+        _searchQuery = keyword;
+        _selectedLocation = location;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -134,13 +241,29 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // ------------------------------------------------------------
+  // OPEN POST DETAILS
+  // ------------------------------------------------------------
+
+  void _openPostDetails(
+    BuildContext context,
+    Map<String, dynamic> post,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PostDetailsScreen(
+          post: post,
+        ),
+      ),
+    );
+  }
+
+  // ------------------------------------------------------------
   // BUILD
   // ------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
-    final posts = _filteredPosts;
-
     return Scaffold(
       drawer: const UserDrawer(),
 
@@ -180,237 +303,369 @@ class _HomeScreenState extends State<HomeScreen> {
       // ----------------------------------------------------------
 
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () async {
-            // Firestore refresh will be added later.
-            await Future.delayed(
-              const Duration(milliseconds: 500),
-            );
+        child:
+            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          stream: _getRecentPosts(),
+          builder: (context, snapshot) {
+            // ----------------------------------------------------
+            // ERROR
+            // ----------------------------------------------------
 
-            if (!mounted) return;
+            if (snapshot.hasError) {
+              debugPrint(
+                'FIRESTORE ERROR: ${snapshot.error}',
+              );
 
-            setState(() {});
-          },
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
-            children: [
-              // ------------------------------------------------
-              // WELCOME SECTION
-              // ------------------------------------------------
+              return _buildErrorState(
+                snapshot.error.toString(),
+              );
+            }
 
-              const Text(
-                'Find what you lost.\nHelp return what you found.',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  height: 1.25,
-                ),
-              ),
+            // ----------------------------------------------------
+            // LOADING
+            // ----------------------------------------------------
 
-              const SizedBox(height: 8),
+            if (snapshot.connectionState ==
+                ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
 
-              Text(
-                'Search recent lost and found posts.',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.grey.shade600,
-                ),
-              ),
+            // ----------------------------------------------------
+            // ALL FIRESTORE POSTS
+            // ----------------------------------------------------
 
-              const SizedBox(height: 20),
+            final List<
+                    QueryDocumentSnapshot<Map<String, dynamic>>>
+                allPosts =
+                snapshot.data?.docs ?? [];
 
-              // ------------------------------------------------
-              // SEARCH BAR
-              // ------------------------------------------------
+            // ----------------------------------------------------
+            // ACTIVE + SORTED + LATEST 20
+            // ----------------------------------------------------
 
-              AppSearchBar(
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value;
-                  });
-                },
-              ),
+            final List<
+                    QueryDocumentSnapshot<Map<String, dynamic>>>
+                recentPosts =
+                _getRecentActivePosts(allPosts);
 
-              const SizedBox(height: 14),
+            // ----------------------------------------------------
+            // SEARCH + LOCATION FILTER
+            // ----------------------------------------------------
 
-              // ------------------------------------------------
-              // FILTER + CREATE POST
-              // ------------------------------------------------
+            final List<
+                    QueryDocumentSnapshot<Map<String, dynamic>>>
+                posts =
+                _filterPosts(recentPosts);
 
-              Row(
+            return RefreshIndicator(
+              onRefresh: () async {
+                // Firestore Stream automatically receives changes.
+                await Future.delayed(
+                  const Duration(milliseconds: 300),
+                );
+              },
+              child: ListView(
+                physics:
+                    const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
                 children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _openSearchFilter,
-                      icon: const Icon(
-                        Icons.filter_list,
-                      ),
-                      label: const Text('Filter'),
-                    ),
-                  ),
+                  // ----------------------------------------------
+                  // WELCOME
+                  // ----------------------------------------------
 
-                  const SizedBox(width: 12),
-
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _openCreatePost,
-                      icon: const Icon(
-                        Icons.add,
-                      ),
-                      label: const Text(
-                        'Create Post',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 18),
-
-              // ------------------------------------------------
-              // LOST / FOUND QUICK ACCESS
-              // ------------------------------------------------
-
-              Row(
-                children: [
-                  Expanded(
-                    child: Card(
-                      margin: EdgeInsets.zero,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: _openLostItems,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 10,
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.search_off_rounded,
-                                size: 30,
-                                color: Colors.orange.shade700,
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                'Lost Items',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 12),
-
-                  Expanded(
-                    child: Card(
-                      margin: EdgeInsets.zero,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: _openFoundItems,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 10,
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.check_circle_outline,
-                                size: 30,
-                                color: Colors.green.shade700,
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                'Found Items',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 28),
-
-              // ------------------------------------------------
-              // RECENT POSTS HEADER
-              // ------------------------------------------------
-
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
-                children: [
                   const Text(
-                    'Recent Posts',
+                    'Find what you lost.\nHelp return what you found.',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      height: 1.25,
                     ),
                   ),
+
+                  const SizedBox(height: 8),
+
                   Text(
-                    '${posts.length} posts',
+                    'Search recent lost and found posts.',
                     style: TextStyle(
+                      fontSize: 15,
                       color: Colors.grey.shade600,
                     ),
                   ),
-                ],
-              ),
 
-              const SizedBox(height: 14),
+                  const SizedBox(height: 20),
 
-              // ------------------------------------------------
-              // POSTS
-              // ------------------------------------------------
+                  // ----------------------------------------------
+                  // SEARCH BAR
+                  // ----------------------------------------------
 
-              if (posts.isEmpty)
-                _buildEmptySearchState()
-              else
-                ...posts.map(
-                  (post) => RecentPostCard(
-                    itemName: post['itemName']!,
-                    category: post['category']!,
-                    postType: post['postType']!,
-                    location: post['location']!,
-                    description: post['description']!,
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'View details for '
-                            '${post['itemName']} '
-                            'will be connected later.',
-                          ),
-                        ),
-                      );
+                  AppSearchBar(
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
                     },
                   ),
-                ),
 
-              const SizedBox(height: 20),
-            ],
-          ),
+                  const SizedBox(height: 14),
+
+                  // ----------------------------------------------
+                  // FILTER + CREATE POST
+                  // ----------------------------------------------
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _openSearchFilter,
+                          icon: const Icon(
+                            Icons.filter_list,
+                          ),
+                          label: const Text(
+                            'Filter',
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _openCreatePost,
+                          icon: const Icon(
+                            Icons.add,
+                          ),
+                          label: const Text(
+                            'Create Post',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  // ----------------------------------------------
+                  // LOST / FOUND QUICK ACCESS
+                  // ----------------------------------------------
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Card(
+                          margin: EdgeInsets.zero,
+                          child: InkWell(
+                            borderRadius:
+                                BorderRadius.circular(12),
+                            onTap: _openLostItems,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(
+                                vertical: 16,
+                                horizontal: 10,
+                              ),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.search_off_rounded,
+                                    size: 30,
+                                    color:
+                                        Colors.orange.shade700,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    'Lost Items',
+                                    style: TextStyle(
+                                      fontWeight:
+                                          FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      Expanded(
+                        child: Card(
+                          margin: EdgeInsets.zero,
+                          child: InkWell(
+                            borderRadius:
+                                BorderRadius.circular(12),
+                            onTap: _openFoundItems,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(
+                                vertical: 16,
+                                horizontal: 10,
+                              ),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons
+                                        .check_circle_outline,
+                                    size: 30,
+                                    color:
+                                        Colors.green.shade700,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    'Found Items',
+                                    style: TextStyle(
+                                      fontWeight:
+                                          FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // ----------------------------------------------
+                  // RECENT POSTS HEADER
+                  // ----------------------------------------------
+
+                  Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Recent Posts',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '${posts.length} posts',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // ----------------------------------------------
+                  // POSTS
+                  // ----------------------------------------------
+
+                  if (posts.isEmpty)
+                    _buildEmptySearchState()
+                  else
+                    ...posts.map(
+                      (doc) {
+                        final Map<String, dynamic> post =
+                            doc.data();
+
+                        return _buildRecentPostCard(
+                          context,
+                          post,
+                        );
+                      },
+                    ),
+
+                  const SizedBox(height: 20),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
   // ------------------------------------------------------------
-  // EMPTY SEARCH STATE
+  // RECENT POST CARD
+  // ------------------------------------------------------------
+
+  Widget _buildRecentPostCard(
+    BuildContext context,
+    Map<String, dynamic> post,
+  ) {
+    final String itemName =
+        post['itemName']?.toString() ?? 'Unnamed Item';
+
+    final String category =
+        post['category']?.toString() ?? '';
+
+    final String postType =
+        post['postType']?.toString() ?? '';
+
+    final String location =
+        post['location']?.toString() ?? '';
+
+    final String description =
+        post['description']?.toString() ?? '';
+
+    final String postUserId =
+        post['userId']?.toString() ?? '';
+
+    final User? currentUser =
+        FirebaseAuth.instance.currentUser;
+
+    final bool isOwner =
+        currentUser != null &&
+        currentUser.uid == postUserId;
+
+    // ----------------------------------------------------------
+    // VALUABLE ITEM PRIVACY
+    //
+    // Found Valuable Item finder information remains private
+    // to public users.
+    // ----------------------------------------------------------
+
+    final bool isPrivateFinderData =
+        post['isPrivateFinderData'] == true;
+
+    final String visibleDescription =
+        isPrivateFinderData && !isOwner
+            ? ''
+            : description;
+
+    // ----------------------------------------------------------
+    // IMPORTANT:
+    // No userName parameter.
+    // No profile picture parameter.
+    // ----------------------------------------------------------
+
+    return RecentPostCard(
+      itemName: itemName,
+      category: category,
+      postType: postType,
+      location: location,
+      description: visibleDescription,
+      isPrivateFinderData:
+          isPrivateFinderData && !isOwner,
+      onTap: () {
+        _openPostDetails(
+          context,
+          post,
+        );
+      },
+    );
+  }
+
+  // ------------------------------------------------------------
+  // EMPTY STATE
   // ------------------------------------------------------------
 
   Widget _buildEmptySearchState() {
+    final bool isFiltered =
+        _searchQuery.trim().isNotEmpty ||
+        _selectedLocation.trim().isNotEmpty;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 24,
@@ -423,16 +678,20 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           Icon(
-            Icons.search_off_rounded,
+            isFiltered
+                ? Icons.search_off_rounded
+                : Icons.inventory_2_outlined,
             size: 52,
             color: Colors.grey.shade500,
           ),
 
           const SizedBox(height: 14),
 
-          const Text(
-            'No posts found',
-            style: TextStyle(
+          Text(
+            isFiltered
+                ? 'No posts found'
+                : 'No recent posts',
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -441,13 +700,59 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 6),
 
           Text(
-            'Try searching with another item name or keyword.',
+            isFiltered
+                ? 'Try searching with another item name or keyword.'
+                : 'No users have created a post yet.',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.grey.shade600,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ------------------------------------------------------------
+  // ERROR STATE
+  // ------------------------------------------------------------
+
+  Widget _buildErrorState(String error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment:
+              MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 60,
+              color: Colors.red.shade400,
+            ),
+
+            const SizedBox(height: 16),
+
+            const Text(
+              'Unable to load recent posts',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            Text(
+              'Please check your internet connection and try again.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -30,8 +30,7 @@ class _RecoveryConfirmationScreenState
   Future<void> _confirmRecovery({
     required bool isOwner,
   }) async {
-    final User? user =
-        FirebaseAuth.instance.currentUser;
+    final User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
       _showMessage(
@@ -41,44 +40,46 @@ class _RecoveryConfirmationScreenState
       return;
     }
 
-    final bool? confirmed =
-        await showDialog<bool>(
+    final String dialogTitle = isOwner
+        ? 'Confirm Item Received?'
+        : 'Confirm Item Returned?';
+
+    final String dialogMessage = isOwner
+        ? 'Please confirm that you have received '
+            'your lost item from the finder. '
+            'This confirmation will be recorded.'
+        : 'Please confirm that you have returned '
+            'the item to the lost item owner. '
+            'This confirmation will be recorded.';
+
+    final String confirmButtonText =
+        isOwner ? 'Confirm Received' : 'Confirm Returned';
+
+    final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text(
-            'Confirm Item Returned?',
-          ),
-          content: const Text(
-            'Please confirm that the item has '
-            'actually been returned/recovered. '
-            'This confirmation will be recorded.',
-          ),
+          title: Text(dialogTitle),
+          content: Text(dialogMessage),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  false,
-                );
+                Navigator.pop(dialogContext, false);
               },
               child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  true,
-                );
+                Navigator.pop(dialogContext, true);
               },
-              child: const Text('Confirm'),
+              child: Text(confirmButtonText),
             ),
           ],
         );
       },
     );
 
-    if (confirmed != true) {
+    if (confirmed != true || !mounted) {
       return;
     }
 
@@ -102,7 +103,9 @@ class _RecoveryConfirmationScreenState
       }
 
       _showMessage(
-        'Your confirmation has been recorded.',
+        isOwner
+            ? 'Item received confirmation recorded.'
+            : 'Item returned confirmation recorded.',
       );
     } catch (e) {
       if (!mounted) {
@@ -133,8 +136,7 @@ class _RecoveryConfirmationScreenState
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor:
-            isError ? Colors.red.shade700 : null,
+        backgroundColor: isError ? Colors.red.shade700 : null,
       ),
     );
   }
@@ -145,15 +147,12 @@ class _RecoveryConfirmationScreenState
 
   @override
   Widget build(BuildContext context) {
-    final User? currentUser =
-        FirebaseAuth.instance.currentUser;
+    final User? currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text(
-            'Recovery Confirmation',
-          ),
+          title: const Text('Recovery Confirmation'),
         ),
         body: _buildLoggedOutState(),
       );
@@ -168,8 +167,7 @@ class _RecoveryConfirmationScreenState
           ),
         ),
       ),
-      body: StreamBuilder<
-          QuerySnapshot<Map<String, dynamic>>>(
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('recoveries')
             .where(
@@ -179,8 +177,7 @@ class _RecoveryConfirmationScreenState
             .limit(1)
             .snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
@@ -190,8 +187,7 @@ class _RecoveryConfirmationScreenState
             return _buildErrorState();
           }
 
-          final docs =
-              snapshot.data?.docs ?? [];
+          final docs = snapshot.data?.docs ?? [];
 
           if (docs.isEmpty) {
             return _buildNotFoundState();
@@ -218,8 +214,7 @@ class _RecoveryConfirmationScreenState
     String currentUserId,
   ) {
     final String status =
-        recovery['status']?.toString() ??
-            'pending';
+        recovery['status']?.toString() ?? 'pending';
 
     final String ownerId =
         recovery['ownerId']?.toString() ?? '';
@@ -227,11 +222,8 @@ class _RecoveryConfirmationScreenState
     final String finderId =
         recovery['finderId']?.toString() ?? '';
 
-    final bool isOwner =
-        currentUserId == ownerId;
-
-    final bool isFinder =
-        currentUserId == finderId;
+    final bool isOwner = currentUserId == ownerId;
+    final bool isFinder = currentUserId == finderId;
 
     final bool ownerConfirmed =
         recovery['ownerConfirmed'] == true;
@@ -239,15 +231,13 @@ class _RecoveryConfirmationScreenState
     final bool finderConfirmed =
         recovery['finderConfirmed'] == true;
 
-    final bool isCompleted =
-        status == 'completed';
+    final bool isCompleted = status == 'completed';
 
     final String recoveryId =
         recovery['recoveryId']?.toString() ??
             widget.recoveryId;
 
-    return FutureBuilder<
-        DocumentSnapshot<Map<String, dynamic>>>(
+    return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       future: _getPostDetails(recovery),
       builder: (context, postSnapshot) {
         if (postSnapshot.connectionState ==
@@ -257,26 +247,21 @@ class _RecoveryConfirmationScreenState
           );
         }
 
-        final postData =
+        final Map<String, dynamic>? postData =
             postSnapshot.data?.data();
 
         final String itemName =
-            postData?['itemName']?.toString() ??
-                'Item';
+            postData?['itemName']?.toString() ?? 'Item';
 
         final String category =
-            postData?['category']?.toString() ??
-                '';
+            postData?['category']?.toString() ?? '';
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(
-                isCompleted,
-              ),
+              _buildHeader(isCompleted),
 
               const SizedBox(height: 22),
 
@@ -298,40 +283,12 @@ class _RecoveryConfirmationScreenState
               if (isCompleted)
                 _buildCompletedCard()
               else if (isOwner)
-                _buildConfirmationButton(
-                  title: ownerConfirmed
-                      ? 'You Have Confirmed'
-                      : 'Confirm Item Returned',
-                  subtitle: ownerConfirmed
-                      ? 'Waiting for the finder to confirm.'
-                      : 'Confirm after receiving your item.',
-                  icon: ownerConfirmed
-                      ? Icons.check_circle
-                      : Icons.assignment_turned_in_outlined,
-                  enabled: !ownerConfirmed,
-                  onPressed: () {
-                    _confirmRecovery(
-                      isOwner: true,
-                    );
-                  },
+                _buildOwnerConfirmationSection(
+                  ownerConfirmed,
                 )
               else if (isFinder)
-                _buildConfirmationButton(
-                  title: finderConfirmed
-                      ? 'You Have Confirmed'
-                      : 'Confirm Item Returned',
-                  subtitle: finderConfirmed
-                      ? 'Waiting for the owner to confirm.'
-                      : 'Confirm after returning the item.',
-                  icon: finderConfirmed
-                      ? Icons.check_circle
-                      : Icons.assignment_turned_in_outlined,
-                  enabled: !finderConfirmed,
-                  onPressed: () {
-                    _confirmRecovery(
-                      isOwner: false,
-                    );
-                  },
+                _buildFinderConfirmationSection(
+                  finderConfirmed,
                 )
               else
                 _buildUnauthorizedCard(),
@@ -353,12 +310,62 @@ class _RecoveryConfirmationScreenState
   }
 
   // ============================================================
+  // OWNER CONFIRMATION
+  // ============================================================
+
+  Widget _buildOwnerConfirmationSection(
+    bool ownerConfirmed,
+  ) {
+    return _buildConfirmationButton(
+      title: ownerConfirmed
+          ? 'Item Received Confirmed'
+          : 'Confirm Item Received',
+      subtitle: ownerConfirmed
+          ? 'Waiting for the finder to confirm the return.'
+          : 'Confirm after you have received your lost item.',
+      icon: ownerConfirmed
+          ? Icons.check_circle
+          : Icons.inventory_2_outlined,
+      enabled: !ownerConfirmed,
+      onPressed: () {
+        _confirmRecovery(
+          isOwner: true,
+        );
+      },
+    );
+  }
+
+  // ============================================================
+  // FINDER CONFIRMATION
+  // ============================================================
+
+  Widget _buildFinderConfirmationSection(
+    bool finderConfirmed,
+  ) {
+    return _buildConfirmationButton(
+      title: finderConfirmed
+          ? 'Item Returned Confirmed'
+          : 'Confirm Item Returned',
+      subtitle: finderConfirmed
+          ? 'Waiting for the lost item owner to confirm receipt.'
+          : 'Confirm after you have returned the item to the owner.',
+      icon: finderConfirmed
+          ? Icons.check_circle
+          : Icons.assignment_return_outlined,
+      enabled: !finderConfirmed,
+      onPressed: () {
+        _confirmRecovery(
+          isOwner: false,
+        );
+      },
+    );
+  }
+
+  // ============================================================
   // GET POST DETAILS
   // ============================================================
 
-  Future<
-      DocumentSnapshot<Map<String, dynamic>>>
-      _getPostDetails(
+  Future<DocumentSnapshot<Map<String, dynamic>>> _getPostDetails(
     Map<String, dynamic> recovery,
   ) async {
     final String lostPostId =
@@ -367,15 +374,12 @@ class _RecoveryConfirmationScreenState
     final String foundPostId =
         recovery['foundPostId']?.toString() ?? '';
 
-    final String postId =
-        lostPostId.isNotEmpty
-            ? lostPostId
-            : foundPostId;
+    final String postId = lostPostId.isNotEmpty
+        ? lostPostId
+        : foundPostId;
 
     if (postId.isEmpty) {
-      throw Exception(
-        'Post ID is missing.',
-      );
+      throw Exception('Post ID is missing.');
     }
 
     return FirebaseFirestore.instance
@@ -404,8 +408,7 @@ class _RecoveryConfirmationScreenState
                   Colors.blue.shade50,
                 ],
         ),
-        borderRadius:
-            BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         children: [
@@ -460,8 +463,7 @@ class _RecoveryConfirmationScreenState
     return Card(
       elevation: 1,
       shape: RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -528,8 +530,7 @@ class _RecoveryConfirmationScreenState
     bool finderConfirmed,
   ) {
     return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'Confirmation Status',
@@ -552,6 +553,10 @@ class _RecoveryConfirmationScreenState
     );
   }
 
+  // ============================================================
+  // STATUS ROW
+  // ============================================================
+
   Widget _buildStatusRow(
     String title,
     bool confirmed,
@@ -563,8 +568,7 @@ class _RecoveryConfirmationScreenState
         color: confirmed
             ? Colors.green.shade50
             : Colors.orange.shade50,
-        borderRadius:
-            BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: confirmed
               ? Colors.green.shade200
@@ -591,9 +595,7 @@ class _RecoveryConfirmationScreenState
             ),
           ),
           Text(
-            confirmed
-                ? 'Confirmed'
-                : 'Pending',
+            confirmed ? 'Confirmed' : 'Pending',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: confirmed
@@ -621,22 +623,18 @@ class _RecoveryConfirmationScreenState
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed:
-            enabled && !_isConfirming
-                ? onPressed
-                : null,
+            enabled && !_isConfirming ? onPressed : null,
         icon: _isConfirming
             ? const SizedBox(
                 width: 20,
                 height: 20,
-                child:
-                    CircularProgressIndicator(
+                child: CircularProgressIndicator(
                   strokeWidth: 2,
                 ),
               )
             : Icon(icon),
         label: Padding(
-          padding:
-              const EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             vertical: 12,
           ),
           child: Column(
@@ -672,27 +670,34 @@ class _RecoveryConfirmationScreenState
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.green.shade50,
-        borderRadius:
-            BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: Colors.green.shade200,
         ),
       ),
-      child: Row(
+      child: Column(
         children: [
           Icon(
             Icons.verified_rounded,
-            size: 34,
+            size: 50,
             color: Colors.green.shade600,
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Text(
-              'The item recovery has been confirmed by both parties.',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: Colors.green.shade800,
-              ),
+          const SizedBox(height: 10),
+          Text(
+            'Mission Completed',
+            style: TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.bold,
+              color: Colors.green.shade800,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'The item recovery has been confirmed by both parties.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Colors.green.shade800,
             ),
           ),
         ],
@@ -710,8 +715,7 @@ class _RecoveryConfirmationScreenState
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
-        borderRadius:
-            BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: const Text(
         'You are not one of the users involved in this recovery request.',
@@ -761,8 +765,7 @@ class _RecoveryConfirmationScreenState
       child: Padding(
         padding: const EdgeInsets.all(30),
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.error_outline,

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/firestore_post_service.dart';
@@ -106,6 +107,43 @@ class FoundItemsScreen extends StatelessWidget {
     final String imageUrl =
         post['imageUrl']?.toString() ?? '';
 
+    final String reward =
+        post['reward']?.toString() ?? '';
+
+    final String postUserId =
+        post['userId']?.toString() ?? '';
+
+    // ----------------------------------------------------------
+    // CURRENT USER
+    // ----------------------------------------------------------
+
+    final User? currentUser =
+        FirebaseAuth.instance.currentUser;
+
+    final bool isOwner =
+        currentUser != null &&
+        currentUser.uid == postUserId;
+
+    // ----------------------------------------------------------
+    // VALUABLE ITEM PRIVACY
+    // ----------------------------------------------------------
+
+    final bool isValuable =
+        category == 'Valuable Items';
+
+    final bool isPrivateValuable =
+        isValuable && !isOwner;
+
+    // ----------------------------------------------------------
+    // PUBLIC-SAFE VALUES
+    // ----------------------------------------------------------
+
+    final String visibleImageUrl =
+        isPrivateValuable ? '' : imageUrl;
+
+    final String visibleDescription =
+        isPrivateValuable ? '' : description;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 14),
       elevation: 1,
@@ -134,9 +172,12 @@ class FoundItemsScreen extends StatelessWidget {
               // IMAGE
               // ------------------------------------------------
 
-              _buildThumbnail(imageUrl),
-
-              const SizedBox(width: 14),
+              if (!isPrivateValuable) ...[
+                _buildThumbnail(
+                  visibleImageUrl,
+                ),
+                const SizedBox(width: 14),
+              ],
 
               // ------------------------------------------------
               // DETAILS
@@ -147,6 +188,10 @@ class FoundItemsScreen extends StatelessWidget {
                   crossAxisAlignment:
                       CrossAxisAlignment.start,
                   children: [
+                    // ------------------------------------------
+                    // ITEM NAME + FOUND STATUS
+                    // ------------------------------------------
+
                     Row(
                       children: [
                         Expanded(
@@ -161,9 +206,7 @@ class FoundItemsScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-
                         const SizedBox(width: 6),
-
                         Container(
                           padding:
                               const EdgeInsets.symmetric(
@@ -189,6 +232,10 @@ class FoundItemsScreen extends StatelessWidget {
 
                     const SizedBox(height: 6),
 
+                    // ------------------------------------------
+                    // CATEGORY
+                    // ------------------------------------------
+
                     if (category.isNotEmpty)
                       Text(
                         category,
@@ -197,6 +244,10 @@ class FoundItemsScreen extends StatelessWidget {
                           color: Colors.grey.shade600,
                         ),
                       ),
+
+                    // ------------------------------------------
+                    // LOCATION
+                    // ------------------------------------------
 
                     if (location.isNotEmpty) ...[
                       const SizedBox(height: 7),
@@ -224,10 +275,66 @@ class FoundItemsScreen extends StatelessWidget {
                       ),
                     ],
 
-                    if (description.isNotEmpty) ...[
+                    // ------------------------------------------
+                    // DATE
+                    // ------------------------------------------
+
+                    if (post['date'] != null) ...[
+                      const SizedBox(height: 7),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_today_outlined,
+                            size: 15,
+                            color: Colors.grey.shade600,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            _formatDate(post['date']),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color:
+                                  Colors.grey.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    // ------------------------------------------
+                    // REWARD
+                    // ------------------------------------------
+
+                    if (reward.isNotEmpty) ...[
+                      const SizedBox(height: 7),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.card_giftcard_outlined,
+                            size: 16,
+                            color: Colors.green.shade700,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            'Reward: ₹$reward',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.green.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    // ------------------------------------------
+                    // DESCRIPTION
+                    // ------------------------------------------
+
+                    if (visibleDescription.isNotEmpty) ...[
                       const SizedBox(height: 7),
                       Text(
-                        description,
+                        visibleDescription,
                         maxLines: 2,
                         overflow:
                             TextOverflow.ellipsis,
@@ -239,7 +346,40 @@ class FoundItemsScreen extends StatelessWidget {
                       ),
                     ],
 
+                    // ------------------------------------------
+                    // PRIVACY MESSAGE
+                    // ------------------------------------------
+
+                    if (isPrivateValuable) ...[
+                      const SizedBox(height: 7),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.lock_outline,
+                            size: 15,
+                            color: Colors.orange.shade700,
+                          ),
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: Text(
+                              'Private item details protected',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color:
+                                    Colors.orange.shade700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
                     const SizedBox(height: 9),
+
+                    // ------------------------------------------
+                    // VIEW DETAILS
+                    // ------------------------------------------
 
                     Row(
                       mainAxisAlignment:
@@ -298,6 +438,10 @@ class FoundItemsScreen extends StatelessWidget {
     return _buildImagePlaceholder();
   }
 
+  // ------------------------------------------------------------
+  // IMAGE PLACEHOLDER
+  // ------------------------------------------------------------
+
   Widget _buildImagePlaceholder() {
     return Container(
       width: 90,
@@ -312,6 +456,32 @@ class FoundItemsScreen extends StatelessWidget {
         color: Colors.grey.shade500,
       ),
     );
+  }
+
+  // ------------------------------------------------------------
+  // DATE FORMAT
+  // ------------------------------------------------------------
+
+  String _formatDate(dynamic value) {
+    if (value == null) {
+      return '';
+    }
+
+    DateTime? date;
+
+    if (value is DateTime) {
+      date = value;
+    } else if (value is Timestamp) {
+      date = value.toDate();
+    }
+
+    if (date == null) {
+      return value.toString();
+    }
+
+    return '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/'
+        '${date.year}';
   }
 
   // ------------------------------------------------------------

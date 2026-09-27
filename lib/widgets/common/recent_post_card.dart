@@ -6,6 +6,7 @@ class RecentPostCard extends StatelessWidget {
   final String postType;
   final String location;
   final String description;
+  final bool isPrivateFinderData;
   final VoidCallback? onTap;
 
   const RecentPostCard({
@@ -15,12 +16,22 @@ class RecentPostCard extends StatelessWidget {
     required this.postType,
     required this.location,
     required this.description,
+    this.isPrivateFinderData = false,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final bool isLost = postType.toLowerCase() == 'lost';
+
+    // ------------------------------------------------------------
+    // PRIVATE FINDER INFORMATION
+    //
+    // Found Valuable Item details remain private.
+    // ------------------------------------------------------------
+
+    final bool hidePrivateDetails =
+        isPrivateFinderData && !isLost;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 14),
@@ -36,13 +47,17 @@ class RecentPostCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ------------------------------------------------
+              // ==================================================
               // TOP ROW
-              // ------------------------------------------------
+              // ==================================================
 
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // ------------------------------------------------
+                  // ITEM ICON
+                  // ------------------------------------------------
+
                   Container(
                     width: 52,
                     height: 52,
@@ -61,13 +76,19 @@ class RecentPostCard extends StatelessWidget {
 
                   const SizedBox(width: 14),
 
+                  // ------------------------------------------------
+                  // ITEM NAME + CATEGORY
+                  // ------------------------------------------------
+
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          itemName,
-                          maxLines: 1,
+                          itemName.isEmpty
+                              ? 'Unnamed Item'
+                              : itemName,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontSize: 18,
@@ -75,22 +96,26 @@ class RecentPostCard extends StatelessWidget {
                           ),
                         ),
 
-                        const SizedBox(height: 5),
-
-                        Text(
-                          category,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey.shade600,
+                        if (category.isNotEmpty) ...[
+                          const SizedBox(height: 5),
+                          Text(
+                            category,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
+                            ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),
 
                   const SizedBox(width: 8),
 
+                  // ------------------------------------------------
                   // LOST / FOUND LABEL
+                  // ------------------------------------------------
+
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
@@ -118,52 +143,99 @@ class RecentPostCard extends StatelessWidget {
 
               const SizedBox(height: 14),
 
-              // ------------------------------------------------
+              // ==================================================
               // LOCATION
-              // ------------------------------------------------
+              // ==================================================
 
-              Row(
-                children: [
-                  Icon(
-                    Icons.location_on_outlined,
-                    size: 19,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      location,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade700,
+              if (location.isNotEmpty)
+                Row(
+                  children: [
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 19,
+                      color: Colors.grey.shade600,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        location,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade700,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 10),
-
-              // ------------------------------------------------
-              // DESCRIPTION
-              // ------------------------------------------------
-
-              Text(
-                description,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 14,
-                  height: 1.4,
-                  color: Colors.grey.shade700,
+                  ],
                 ),
-              ),
+
+              // ==================================================
+              // DESCRIPTION
+              //
+              // Hidden for Found Valuable Items.
+              // ==================================================
+
+              if (!hidePrivateDetails &&
+                  description.trim().isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Text(
+                  description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.4,
+                    color: Colors.grey.shade700,
+                  ),
+                ),
+              ],
+
+              // ==================================================
+              // PRIVATE INFORMATION NOTICE
+              // ==================================================
+
+              if (hidePrivateDetails) ...[
+                const SizedBox(height: 10),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 9,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Colors.blue.shade100,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.lock_outline,
+                        size: 17,
+                        color: Colors.blue.shade700,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Some item details are private for verification.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.blue.shade800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
 
               const SizedBox(height: 14),
 
-              // ------------------------------------------------
+              // ==================================================
               // VIEW DETAILS
-              // ------------------------------------------------
+              // ==================================================
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,

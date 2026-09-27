@@ -6,6 +6,7 @@ import '../../services/firestore_post_service.dart';
 import '../../services/recovery_service.dart';
 import 'edit_post_screen.dart';
 import 'post_details_screen.dart';
+import 'recovery_confirmation_screen.dart';
 
 class MyItemsScreen extends StatelessWidget {
   MyItemsScreen({super.key});
@@ -32,13 +33,16 @@ class MyItemsScreen extends StatelessWidget {
       ),
       body: user == null
           ? _buildNotLoggedInState()
-          : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: _postService.getUserPosts(user.uid),
+          : StreamBuilder<
+              QuerySnapshot<Map<String, dynamic>>>(
+              stream:
+                  _postService.getUserPosts(user.uid),
               builder: (context, snapshot) {
                 if (snapshot.connectionState ==
                     ConnectionState.waiting) {
                   return const Center(
-                    child: CircularProgressIndicator(),
+                    child:
+                        CircularProgressIndicator(),
                   );
                 }
 
@@ -54,9 +58,11 @@ class MyItemsScreen extends StatelessWidget {
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding:
+                      const EdgeInsets.all(16),
                   itemCount: posts.length,
-                  itemBuilder: (context, index) {
+                  itemBuilder:
+                      (context, index) {
                     final post =
                         posts[index].data();
 
@@ -79,6 +85,17 @@ class MyItemsScreen extends StatelessWidget {
     BuildContext context,
     Map<String, dynamic> post,
   ) async {
+    final User? currentUser =
+        FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      _showMessage(
+        context,
+        'Please log in again.',
+      );
+      return;
+    }
+
     final String postId =
         post['postId']?.toString() ?? '';
 
@@ -87,7 +104,8 @@ class MyItemsScreen extends StatelessWidget {
             'this item';
 
     final String matchedPostId =
-        post['matchedPostId']?.toString() ?? '';
+        post['matchedPostId']?.toString() ??
+            '';
 
     if (postId.isEmpty) {
       _showMessage(
@@ -98,13 +116,14 @@ class MyItemsScreen extends StatelessWidget {
     }
 
     // ----------------------------------------------------------
-    // A matched post is required for the recovery workflow.
+    // A matched post is required for the current
+    // lost/found recovery workflow.
     // ----------------------------------------------------------
 
     if (matchedPostId.isEmpty) {
       _showMessage(
         context,
-        'This item has not been matched with another post yet.',
+        'This item has not been connected to a matching Lost/Found post yet.',
       );
       return;
     }
@@ -115,14 +134,14 @@ class MyItemsScreen extends StatelessWidget {
       builder: (dialogContext) {
         return AlertDialog(
           title: const Text(
-            'Item Returned?',
+            'Start Item Recovery?',
           ),
           content: Text(
-            'Have you successfully returned or received '
-            '"$itemName"?\n\n'
-            'After confirmation, the other person will also '
-            'need to confirm the recovery before the post is '
-            'marked as completed.',
+            'Do you want to start the recovery process '
+            'for "$itemName"?\n\n'
+            'After the recovery request is created, '
+            'both the owner and finder must confirm '
+            'the item return.',
           ),
           actions: [
             TextButton(
@@ -132,7 +151,9 @@ class MyItemsScreen extends StatelessWidget {
                   false,
                 );
               },
-              child: const Text('Cancel'),
+              child: const Text(
+                'Cancel',
+              ),
             ),
             ElevatedButton(
               onPressed: () {
@@ -142,7 +163,7 @@ class MyItemsScreen extends StatelessWidget {
                 );
               },
               child: const Text(
-                'Confirm',
+                'Continue',
               ),
             ),
           ],
@@ -156,11 +177,15 @@ class MyItemsScreen extends StatelessWidget {
 
     try {
       // --------------------------------------------------------
-      // Get the current post.
+      // Get current post.
       // --------------------------------------------------------
 
-      final currentPost =
-          await _recoveryService.getPost(postId);
+      final DocumentSnapshot<
+              Map<String, dynamic>>
+          currentPost =
+          await _recoveryService.getPost(
+        postId,
+      );
 
       if (!currentPost.exists) {
         _showMessage(
@@ -170,7 +195,7 @@ class MyItemsScreen extends StatelessWidget {
         return;
       }
 
-      final currentData =
+      final Map<String, dynamic>? currentData =
           currentPost.data();
 
       if (currentData == null) {
@@ -185,7 +210,9 @@ class MyItemsScreen extends StatelessWidget {
       // Get matched post.
       // --------------------------------------------------------
 
-      final matchedPost =
+      final DocumentSnapshot<
+              Map<String, dynamic>>
+          matchedPost =
           await _recoveryService.getPost(
         matchedPostId,
       );
@@ -198,7 +225,7 @@ class MyItemsScreen extends StatelessWidget {
         return;
       }
 
-      final matchedData =
+      final Map<String, dynamic>? matchedData =
           matchedPost.data();
 
       if (matchedData == null) {
@@ -220,7 +247,7 @@ class MyItemsScreen extends StatelessWidget {
               '';
 
       // --------------------------------------------------------
-      // Determine lost and found posts.
+      // Determine Lost and Found posts.
       // --------------------------------------------------------
 
       String lostPostId;
@@ -246,16 +273,18 @@ class MyItemsScreen extends StatelessWidget {
       } else {
         _showMessage(
           context,
-          'The matched posts do not form a valid lost/found pair.',
+          'The matched posts do not form a valid Lost/Found pair.',
         );
         return;
       }
 
       final String ownerId =
-          lostData['userId']?.toString() ?? '';
+          lostData['userId']?.toString() ??
+              '';
 
       final String finderId =
-          foundData['userId']?.toString() ?? '';
+          foundData['userId']?.toString() ??
+              '';
 
       if (ownerId.isEmpty ||
           finderId.isEmpty) {
@@ -267,11 +296,27 @@ class MyItemsScreen extends StatelessWidget {
       }
 
       // --------------------------------------------------------
+      // Make sure current user is one of the two users.
+      // --------------------------------------------------------
+
+      if (currentUser.uid != ownerId &&
+          currentUser.uid != finderId) {
+        _showMessage(
+          context,
+          'You are not part of this recovery.',
+        );
+        return;
+      }
+
+      // --------------------------------------------------------
       // Check whether recovery already exists.
       // --------------------------------------------------------
 
-      final existingRecovery =
-          await _recoveryService.getRecoveryByPosts(
+      final QuerySnapshot<
+              Map<String, dynamic>>
+          existingRecovery =
+          await _recoveryService
+              .getRecoveryByPosts(
         lostPostId: lostPostId,
         foundPostId: foundPostId,
       );
@@ -279,18 +324,26 @@ class MyItemsScreen extends StatelessWidget {
       String recoveryId;
 
       if (existingRecovery.docs.isNotEmpty) {
-        recoveryId =
-            existingRecovery.docs.first.id;
+        // ------------------------------------------------------
+        // Recovery already exists.
+        // ------------------------------------------------------
 
-        final recoveryData =
-            existingRecovery.docs.first.data();
+        final QueryDocumentSnapshot<
+                Map<String, dynamic>>
+            recoveryDoc =
+            existingRecovery.docs.first;
+
+        recoveryId = recoveryDoc.id;
+
+        final Map<String, dynamic>
+            recoveryData =
+            recoveryDoc.data();
 
         final String status =
             recoveryData['status']
                     ?.toString() ??
                 'pending';
 
-        // Already completed.
         if (status == 'completed') {
           _showMessage(
             context,
@@ -299,105 +352,44 @@ class MyItemsScreen extends StatelessWidget {
           return;
         }
 
-        // ------------------------------------------------------
-        // Confirm according to current user's role.
-        // ------------------------------------------------------
-
-        final User? currentUser =
-            FirebaseAuth.instance.currentUser;
-
-        if (currentUser == null) {
+        if (status == 'cancelled') {
           _showMessage(
             context,
-            'Please log in again.',
-          );
-          return;
-        }
-
-        if (currentUser.uid == ownerId) {
-          if (recoveryData['ownerConfirmed'] == true) {
-            _showMessage(
-              context,
-              'You have already confirmed this recovery.',
-            );
-            return;
-          }
-
-          await _recoveryService.confirmByOwner(
-            recoveryId,
-          );
-        } else if (currentUser.uid == finderId) {
-          if (recoveryData['finderConfirmed'] == true) {
-            _showMessage(
-              context,
-              'You have already confirmed this recovery.',
-            );
-            return;
-          }
-
-          await _recoveryService.confirmByFinder(
-            recoveryId,
-          );
-        } else {
-          _showMessage(
-            context,
-            'You are not part of this recovery.',
+            'This recovery request was cancelled.',
           );
           return;
         }
       } else {
         // ------------------------------------------------------
-        // Create a new recovery request.
+        // Create new recovery request.
         // ------------------------------------------------------
 
         recoveryId =
-            await _recoveryService.createRecoveryRequest(
+            await _recoveryService
+                .createRecoveryRequest(
           lostPostId: lostPostId,
           foundPostId: foundPostId,
           ownerId: ownerId,
           finderId: finderId,
         );
-
-        // ------------------------------------------------------
-        // Confirm the person who started the recovery.
-        // ------------------------------------------------------
-
-        final User? currentUser =
-            FirebaseAuth.instance.currentUser;
-
-        if (currentUser == null) {
-          _showMessage(
-            context,
-            'Please log in again.',
-          );
-          return;
-        }
-
-        if (currentUser.uid == ownerId) {
-          await _recoveryService.confirmByOwner(
-            recoveryId,
-          );
-        } else if (currentUser.uid == finderId) {
-          await _recoveryService.confirmByFinder(
-            recoveryId,
-          );
-        } else {
-          _showMessage(
-            context,
-            'You are not part of this recovery.',
-          );
-          return;
-        }
       }
 
       if (!context.mounted) {
         return;
       }
 
-      _showMessage(
+      // --------------------------------------------------------
+      // Open the existing Recovery Confirmation screen.
+      // --------------------------------------------------------
+
+      await Navigator.push(
         context,
-        'Your confirmation has been recorded. '
-        'The other person must also confirm the recovery.',
+        MaterialPageRoute(
+          builder: (_) =>
+              RecoveryConfirmationScreen(
+            recoveryId: recoveryId,
+          ),
+        ),
       );
     } catch (e) {
       if (!context.mounted) {
@@ -406,7 +398,8 @@ class MyItemsScreen extends StatelessWidget {
 
       _showMessage(
         context,
-        'Unable to process the recovery. Please try again.',
+        'Unable to start the recovery process. '
+        'Please try again.',
       );
     }
   }
@@ -452,9 +445,11 @@ class MyItemsScreen extends StatelessWidget {
                   true,
                 );
               },
-              style: ElevatedButton.styleFrom(
+              style:
+                  ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+                foregroundColor:
+                    Colors.white,
               ),
               child: const Text(
                 'Delete',
@@ -542,18 +537,27 @@ class MyItemsScreen extends StatelessWidget {
         post['status']?.toString() ??
             'active';
 
+    final String recoveryStatus =
+        post['recoveryStatus']
+                ?.toString() ??
+            'not_started';
+
     final bool isCompleted =
         post['isCompleted'] == true ||
             status == 'completed';
 
+    // IMPORTANT:
+    // RecoveryService uses "return_pending".
     final bool recoveryPending =
-        status == 'returned_pending';
+        recoveryStatus == 'return_pending' ||
+            status == 'return_pending';
 
     final String imageUrl =
         post['imageUrl']?.toString() ?? '';
 
     return Card(
-      margin: const EdgeInsets.only(
+      margin:
+          const EdgeInsets.only(
         bottom: 14,
       ),
       elevation:
@@ -595,11 +599,9 @@ class MyItemsScreen extends StatelessWidget {
                 imageUrl,
                 isCompleted,
               ),
-
               const SizedBox(
                 width: 14,
               ),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment:
@@ -624,26 +626,24 @@ class MyItemsScreen extends StatelessWidget {
                               fontWeight:
                                   FontWeight.bold,
                               color: isCompleted
-                                  ? Colors.grey.shade700
+                                  ? Colors
+                                      .grey
+                                      .shade700
                                   : null,
                             ),
                           ),
                         ),
-
                         const SizedBox(
                           width: 6,
                         ),
-
                         _buildStatusBadge(
                           postType,
                           isCompleted,
                           recoveryPending,
                         ),
-
                         const SizedBox(
                           width: 2,
                         ),
-
                         PopupMenuButton<String>(
                           tooltip:
                               'More options',
@@ -683,8 +683,7 @@ class MyItemsScreen extends StatelessWidget {
                             if (!isCompleted)
                               const PopupMenuItem<
                                   String>(
-                                value:
-                                    'edit',
+                                value: 'edit',
                                 child: Row(
                                   children: [
                                     Icon(
@@ -792,8 +791,7 @@ class MyItemsScreen extends StatelessWidget {
                             child: Text(
                               location,
                               overflow:
-                                  TextOverflow
-                                      .ellipsis,
+                                  TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Colors
@@ -840,8 +838,7 @@ class MyItemsScreen extends StatelessWidget {
                           Row(
                             children: [
                               Icon(
-                                Icons
-                                    .check_circle,
+                                Icons.check_circle,
                                 size: 17,
                                 color: Colors
                                     .green
@@ -894,8 +891,7 @@ class MyItemsScreen extends StatelessWidget {
                           )
                         else
                           Text(
-                            postType ==
-                                    'Lost'
+                            postType == 'Lost'
                                 ? 'Lost Item'
                                 : 'Found Item',
                             style: TextStyle(
@@ -905,7 +901,6 @@ class MyItemsScreen extends StatelessWidget {
                                   .shade600,
                             ),
                           ),
-
                         Row(
                           children: [
                             Text(
@@ -913,8 +908,7 @@ class MyItemsScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight:
-                                    FontWeight
-                                        .bold,
+                                    FontWeight.bold,
                                 color: Colors
                                     .teal
                                     .shade700,

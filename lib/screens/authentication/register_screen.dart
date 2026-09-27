@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/firebase_auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -61,13 +63,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       // Update Firebase Authentication display name
       if (credential.user != null) {
-        await credential.user!.updateDisplayName(
+        final user = credential.user!;
+      
+        await user.updateDisplayName(
           _nameController.text.trim(),
         );
-
-        await credential.user!.reload();
+      
+        await user.reload();
+      
+        // ----------------------------------------------------------
+        // CREATE USER PROFILE IN FIRESTORE
+        // ----------------------------------------------------------
+      
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .set({
+          'userId': user.uid,
+          'name': _nameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'phone': _phoneController.text.trim(),
+      
+          // We currently do not upload profile pictures.
+          // Empty value means the app uses the default picture.
+          'profileImageUrl': '',
+      
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
       }
-
       if (!mounted) return;
 
       _showMessage(
