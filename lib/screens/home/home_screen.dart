@@ -1,3 +1,4 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -34,31 +35,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ------------------------------------------------------------
   // PREPARE RECENT ACTIVE POSTS
-  //
-  // Filtering and sorting are done in Dart instead of Firestore.
   // ------------------------------------------------------------
 
   List<QueryDocumentSnapshot<Map<String, dynamic>>>
       _getRecentActivePosts(
     List<QueryDocumentSnapshot<Map<String, dynamic>>> allPosts,
   ) {
-    // ----------------------------------------------------------
-    // ONLY ACTIVE POSTS
-    // ----------------------------------------------------------
-
-    final activePosts =
-        allPosts.where((doc) {
+    final activePosts = allPosts.where((doc) {
       final Map<String, dynamic> post = doc.data();
 
       return post['status']?.toString().toLowerCase() == 'active';
     }).toList();
-
-    // ----------------------------------------------------------
-    // SORT BY CREATED DATE
-    //
-    // Newest posts appear first.
-    // Posts without createdAt are placed at the bottom.
-    // ----------------------------------------------------------
 
     activePosts.sort((a, b) {
       final dynamic valueA = a.data()['createdAt'];
@@ -84,10 +71,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
       return dateB.compareTo(dateA);
     });
-
-    // ----------------------------------------------------------
-    // LATEST 20 POSTS
-    // ----------------------------------------------------------
 
     return activePosts.take(20).toList();
   }
@@ -129,10 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // --------------------------------------------------------
       // VALUABLE ITEM PRIVACY
-      //
-      // Finder details for Found Valuable Items must not be
-      // searchable publicly through the private description.
-      // The owner can still search their own description.
       // --------------------------------------------------------
 
       final bool isPrivateFinderData =
@@ -259,6 +238,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // ------------------------------------------------------------
+  // OPEN NOTIFICATIONS
+  //
+  // This only connects the Home notification icon to the
+  // existing NotificationsScreen through AppRoutes.
+  // ------------------------------------------------------------
+
+  void _openNotifications() {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.notifications,
+    );
+  }
+
+  // ------------------------------------------------------------
   // BUILD
   // ------------------------------------------------------------
 
@@ -282,15 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             tooltip: 'Notifications',
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Notifications will be available soon.',
-                  ),
-                ),
-              );
-            },
+            onPressed: _openNotifications,
             icon: const Icon(
               Icons.notifications_outlined,
             ),
@@ -361,7 +346,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
             return RefreshIndicator(
               onRefresh: () async {
-                // Firestore Stream automatically receives changes.
                 await Future.delayed(
                   const Duration(milliseconds: 300),
                 );
@@ -506,8 +490,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Column(
                                 children: [
                                   Icon(
-                                    Icons
-                                        .check_circle_outline,
+                                    Icons.check_circle_outline,
                                     size: 30,
                                     color:
                                         Colors.green.shade700,
@@ -621,9 +604,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // ----------------------------------------------------------
     // VALUABLE ITEM PRIVACY
-    //
-    // Found Valuable Item finder information remains private
-    // to public users.
     // ----------------------------------------------------------
 
     final bool isPrivateFinderData =
@@ -633,12 +613,6 @@ class _HomeScreenState extends State<HomeScreen> {
         isPrivateFinderData && !isOwner
             ? ''
             : description;
-
-    // ----------------------------------------------------------
-    // IMPORTANT:
-    // No userName parameter.
-    // No profile picture parameter.
-    // ----------------------------------------------------------
 
     return RecentPostCard(
       itemName: itemName,

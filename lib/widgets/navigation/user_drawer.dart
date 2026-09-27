@@ -1,4 +1,7 @@
+
 import 'package:flutter/material.dart';
+
+import '../../core/routes/app_routes.dart';
 
 class UserDrawer extends StatelessWidget {
   const UserDrawer({super.key});
@@ -57,7 +60,7 @@ class UserDrawer extends StatelessWidget {
 
                 Navigator.pushNamedAndRemoveUntil(
                   context,
-                  '/login',
+                  AppRoutes.login,
                   (route) => false,
                 );
               },
@@ -172,7 +175,7 @@ class UserDrawer extends StatelessWidget {
                     onTap: () {
                       _navigate(
                         context,
-                        '/account',
+                        AppRoutes.account,
                       );
                     },
                   ),
@@ -189,7 +192,7 @@ class UserDrawer extends StatelessWidget {
                     onTap: () {
                       _navigate(
                         context,
-                        '/lost-items',
+                        AppRoutes.lostItems,
                       );
                     },
                   ),
@@ -206,7 +209,7 @@ class UserDrawer extends StatelessWidget {
                     onTap: () {
                       _navigate(
                         context,
-                        '/found-items',
+                        AppRoutes.foundItems,
                       );
                     },
                   ),
@@ -223,7 +226,7 @@ class UserDrawer extends StatelessWidget {
                     onTap: () {
                       _navigate(
                         context,
-                        '/my-items',
+                        AppRoutes.myItems,
                       );
                     },
                   ),
@@ -238,13 +241,9 @@ class UserDrawer extends StatelessWidget {
                     ),
                     title: const Text('Notifications'),
                     onTap: () {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Notifications will be available soon.',
-                          ),
-                        ),
+                      _navigate(
+                        context,
+                        AppRoutes.notifications,
                       );
                     },
                   ),
@@ -265,7 +264,7 @@ class UserDrawer extends StatelessWidget {
                     onTap: () {
                       _navigate(
                         context,
-                        '/about',
+                        AppRoutes.about,
                       );
                     },
                   ),
