@@ -1,7 +1,10 @@
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../services/firebase_auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../services/firebase_auth_service.dart';
+import '../../services/notification_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -13,10 +16,17 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final FirebaseAuthService _authService = FirebaseAuthService();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final NotificationService _notificationService =
+      NotificationService();
+
+  final TextEditingController _nameController =
+      TextEditingController();
+  final TextEditingController _emailController =
+      TextEditingController();
+  final TextEditingController _phoneController =
+      TextEditingController();
+  final TextEditingController _passwordController =
+      TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
@@ -55,26 +65,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      // Create account in Firebase Authentication
+      // ----------------------------------------------------------
+      // CREATE ACCOUNT IN FIREBASE AUTHENTICATION
+      // ----------------------------------------------------------
+
       final credential = await _authService.registerUser(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
 
-      // Update Firebase Authentication display name
+      // ----------------------------------------------------------
+      // UPDATE FIREBASE AUTHENTICATION DISPLAY NAME
+      // ----------------------------------------------------------
+
       if (credential.user != null) {
         final user = credential.user!;
-      
+
         await user.updateDisplayName(
           _nameController.text.trim(),
         );
-      
+
         await user.reload();
-      
-        // ----------------------------------------------------------
+
+        // --------------------------------------------------------
         // CREATE USER PROFILE IN FIRESTORE
-        // ----------------------------------------------------------
-      
+        // --------------------------------------------------------
+
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
@@ -83,15 +99,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
           'name': _nameController.text.trim(),
           'email': _emailController.text.trim(),
           'phone': _phoneController.text.trim(),
-      
+
           // We currently do not upload profile pictures.
           // Empty value means the app uses the default picture.
           'profileImageUrl': '',
-      
+
           'createdAt': FieldValue.serverTimestamp(),
           'updatedAt': FieldValue.serverTimestamp(),
         });
+
+        // --------------------------------------------------------
+        // ACCOUNT CREATED NOTIFICATION
+        // --------------------------------------------------------
+        //
+        // This notification is created only after the Firebase
+        // account and user profile have been created successfully.
+        //
+        // If notification creation fails, registration itself
+        // should still remain successful.
+        // --------------------------------------------------------
+
+        try {
+          await _notificationService.createNotification(
+            userId: user.uid,
+            title: 'Account Created',
+            message:
+                'Your WhereIsIt account has been created successfully.',
+            type: 'account_created',
+          );
+        } catch (_) {
+          // Notification failure must not prevent account creation.
+        }
       }
+
       if (!mounted) return;
 
       _showMessage(
@@ -99,12 +139,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
         isError: false,
       );
 
-      // Return to Login screen
-      await Future.delayed(const Duration(milliseconds: 800));
+      // ----------------------------------------------------------
+      // RETURN TO LOGIN SCREEN
+      // ----------------------------------------------------------
+
+      await Future.delayed(
+        const Duration(milliseconds: 800),
+      );
 
       if (!mounted) return;
 
-      Navigator.pushReplacementNamed(context, '/login');
+      Navigator.pushReplacementNamed(
+        context,
+        '/login',
+      );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 
@@ -124,11 +172,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           break;
 
         case 'network-request-failed':
-          message = 'Network error. Please check your internet connection.';
+          message =
+              'Network error. Please check your internet connection.';
           break;
 
         default:
-          message = e.message ?? 'Unable to create account.';
+          message =
+              e.message ?? 'Unable to create account.';
       }
 
       _showMessage(
@@ -164,7 +214,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         content: Row(
           children: [
             Icon(
-              isError ? Icons.error_outline : Icons.check_circle_outline,
+              isError
+                  ? Icons.error_outline
+                  : Icons.check_circle_outline,
               color: Colors.white,
             ),
             const SizedBox(width: 10),
@@ -389,7 +441,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Form(
                   key: _formKey,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.stretch,
                     children: [
                       // NAME
                       _buildTextField(
@@ -399,7 +452,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         icon: Icons.person_outline,
                         keyboardType: TextInputType.name,
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
+                          if (value == null ||
+                              value.trim().isEmpty) {
                             return 'Please enter your name';
                           }
 
@@ -419,9 +473,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         label: 'Email',
                         hint: 'Enter your email',
                         icon: Icons.email_outlined,
-                        keyboardType: TextInputType.emailAddress,
+                        keyboardType:
+                            TextInputType.emailAddress,
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
+                          if (value == null ||
+                              value.trim().isEmpty) {
                             return 'Please enter your email';
                           }
 
@@ -429,7 +485,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
                           );
 
-                          if (!emailRegex.hasMatch(value.trim())) {
+                          if (!emailRegex.hasMatch(
+                            value.trim(),
+                          )) {
                             return 'Please enter a valid email';
                           }
 
@@ -445,15 +503,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         label: 'Phone Number',
                         hint: 'Enter your phone number',
                         icon: Icons.phone_outlined,
-                        keyboardType: TextInputType.phone,
+                        keyboardType:
+                            TextInputType.phone,
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
+                          if (value == null ||
+                              value.trim().isEmpty) {
                             return 'Please enter your phone number';
                           }
 
-                          final phoneRegex = RegExp(r'^[0-9]{10}$');
+                          final phoneRegex =
+                              RegExp(r'^[0-9]{10}$');
 
-                          if (!phoneRegex.hasMatch(value.trim())) {
+                          if (!phoneRegex.hasMatch(
+                            value.trim(),
+                          )) {
                             return 'Enter a valid 10-digit phone number';
                           }
 
@@ -473,7 +536,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         suffixIcon: IconButton(
                           onPressed: () {
                             setState(() {
-                              _obscurePassword = !_obscurePassword;
+                              _obscurePassword =
+                                  !_obscurePassword;
                             });
                           },
                           icon: Icon(
@@ -484,7 +548,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
+                          if (value == null ||
+                              value.isEmpty) {
                             return 'Please enter a password';
                           }
 
@@ -500,11 +565,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                       // CONFIRM PASSWORD
                       _buildTextField(
-                        controller: _confirmPasswordController,
+                        controller:
+                            _confirmPasswordController,
                         label: 'Confirm Password',
                         hint: 'Re-enter your password',
                         icon: Icons.lock_reset_outlined,
-                        obscureText: _obscureConfirmPassword,
+                        obscureText:
+                            _obscureConfirmPassword,
                         suffixIcon: IconButton(
                           onPressed: () {
                             setState(() {
@@ -520,11 +587,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
+                          if (value == null ||
+                              value.isEmpty) {
                             return 'Please confirm your password';
                           }
 
-                          if (value != _passwordController.text) {
+                          if (value !=
+                              _passwordController.text) {
                             return 'Passwords do not match';
                           }
 
@@ -541,7 +610,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       SizedBox(
                         height: 58,
                         child: ElevatedButton(
-                          onPressed: _isLoading ? null : _createAccount,
+                          onPressed:
+                              _isLoading ? null : _createAccount,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: accentColor,
                             disabledBackgroundColor:
@@ -549,31 +619,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             foregroundColor: Colors.white,
                             elevation: 5,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
+                              borderRadius:
+                                  BorderRadius.circular(18),
                             ),
                           ),
                           child: _isLoading
                               ? const SizedBox(
                                   width: 25,
                                   height: 25,
-                                  child: CircularProgressIndicator(
+                                  child:
+                                      CircularProgressIndicator(
                                     strokeWidth: 3,
                                     valueColor:
-                                        AlwaysStoppedAnimation<Color>(
+                                        AlwaysStoppedAnimation<
+                                            Color>(
                                       Colors.white,
                                     ),
                                   ),
                                 )
                               : const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.person_add_outlined),
+                                    Icon(
+                                      Icons.person_add_outlined,
+                                    ),
                                     SizedBox(width: 10),
                                     Text(
                                       'Create Account',
                                       style: TextStyle(
                                         fontSize: 18,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight:
+                                            FontWeight.bold,
                                       ),
                                     ),
                                   ],
@@ -588,7 +665,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       // ------------------------------------------------
 
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment:
+                            MainAxisAlignment.center,
                         children: [
                           Text(
                             'Already have an account? ',
@@ -620,7 +698,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       // ------------------------------------------------
 
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment:
+                            MainAxisAlignment.center,
                         children: [
                           Icon(
                             Icons.verified_user_outlined,

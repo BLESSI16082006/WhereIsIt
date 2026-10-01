@@ -1,9 +1,15 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import 'notification_service.dart';
 
 class RecoveryService {
   final FirebaseFirestore _firestore =
       FirebaseFirestore.instance;
+
+  final NotificationService _notificationService =
+      NotificationService();
 
   CollectionReference<Map<String, dynamic>> get _recoveries =>
       _firestore.collection('recoveries');
@@ -12,6 +18,10 @@ class RecoveryService {
       _firestore.collection('posts');
 
   User? get _currentUser => FirebaseAuth.instance.currentUser;
+
+  // ------------------------------------------------------------
+  // CREATE RECOVERY REQUEST
+  // ------------------------------------------------------------
 
   Future<String> createRecoveryRequest({
     required String lostPostId,
@@ -176,6 +186,10 @@ class RecoveryService {
     return recoveryRef.id;
   }
 
+  // ------------------------------------------------------------
+  // UPDATE CURRENT USER'S POST
+  // ------------------------------------------------------------
+
   Future<void> _updateCurrentUsersPost({
     required String lostPostId,
     required String foundPostId,
@@ -216,11 +230,19 @@ class RecoveryService {
     );
   }
 
+  // ------------------------------------------------------------
+  // GET RECOVERY
+  // ------------------------------------------------------------
+
   Future<DocumentSnapshot<Map<String, dynamic>>> getRecovery(
     String recoveryId,
   ) {
     return _recoveries.doc(recoveryId).get();
   }
+
+  // ------------------------------------------------------------
+  // GET RECOVERY BY POSTS
+  // ------------------------------------------------------------
 
   Future<QuerySnapshot<Map<String, dynamic>>> getRecoveryByPosts({
     required String lostPostId,
@@ -238,6 +260,10 @@ class RecoveryService {
         .limit(1)
         .get();
   }
+
+  // ------------------------------------------------------------
+  // OWNER CONFIRMATION
+  // ------------------------------------------------------------
 
   Future<void> confirmByOwner(
     String recoveryId,
@@ -270,7 +296,13 @@ class RecoveryService {
       );
     }
 
-    if (data['ownerId']?.toString() != user.uid) {
+    final String ownerId =
+        data['ownerId']?.toString() ?? '';
+
+    final String finderId =
+        data['finderId']?.toString() ?? '';
+
+    if (ownerId != user.uid) {
       throw Exception(
         'Only the lost item owner can confirm item received.',
       );
@@ -309,8 +341,54 @@ class RecoveryService {
       });
     }
 
+    // ----------------------------------------------------------
+    // ITEM RETURN CONFIRMED
+    // Notify the owner who confirmed.
+    // ----------------------------------------------------------
+
+    await _createSafeNotification(
+      userId: ownerId,
+      title: 'Item Return Confirmed',
+      message:
+          'You confirmed that you received the item from the finder.',
+      type: 'item_confirmation',
+    );
+
+    // ----------------------------------------------------------
+    // CHECK WHETHER BOTH SIDES HAVE CONFIRMED
+    // ----------------------------------------------------------
+
+    final bool finderConfirmed =
+        data['finderConfirmed'] == true;
+
+    if (finderConfirmed) {
+      await _createRecoverySuccessNotifications(
+        ownerId: ownerId,
+        finderId: finderId,
+      );
+    } else {
+      // --------------------------------------------------------
+      // RECOVERY WAITING
+      // Notify finder that owner has confirmed and
+      // finder confirmation is still required.
+      // --------------------------------------------------------
+
+      await _createSafeNotification(
+        userId: finderId,
+        title: 'Recovery Waiting',
+        message:
+            'The owner has confirmed receiving the item. '
+            'Please confirm that the item was returned.',
+        type: 'recovery_waiting',
+      );
+    }
+
     await _checkAndCompleteRecovery(recoveryId);
   }
+
+  // ------------------------------------------------------------
+  // FINDER CONFIRMATION
+  // ------------------------------------------------------------
 
   Future<void> confirmByFinder(
     String recoveryId,
@@ -343,7 +421,13 @@ class RecoveryService {
       );
     }
 
-    if (data['finderId']?.toString() != user.uid) {
+    final String ownerId =
+        data['ownerId']?.toString() ?? '';
+
+    final String finderId =
+        data['finderId']?.toString() ?? '';
+
+    if (finderId != user.uid) {
       throw Exception(
         'Only the finder can confirm item returned.',
       );
@@ -382,8 +466,108 @@ class RecoveryService {
       });
     }
 
+    // ----------------------------------------------------------
+    // ITEM RETURN CONFIRMED
+    // Notify the finder who confirmed.
+    // ----------------------------------------------------------
+
+    await _createSafeNotification(
+      userId: finderId,
+      title: 'Item Return Confirmed',
+      message:
+          'You confirmed that you returned the item to the owner.',
+      type: 'item_confirmation',
+    );
+
+    // ----------------------------------------------------------
+    // CHECK WHETHER BOTH SIDES HAVE CONFIRMED
+    // ----------------------------------------------------------
+
+    final bool ownerConfirmed =
+        data['ownerConfirmed'] == true;
+
+    if (ownerConfirmed) {
+      await _createRecoverySuccessNotifications(
+        ownerId: ownerId,
+        finderId: finderId,
+      );
+    } else {
+      // --------------------------------------------------------
+      // RECOVERY WAITING
+      // Notify owner that finder has confirmed and
+      // owner confirmation is still required.
+      // --------------------------------------------------------
+
+      await _createSafeNotification(
+        userId: ownerId,
+        title: 'Recovery Waiting',
+        message:
+            'The finder has confirmed returning the item. '
+            'Please confirm that you received it.',
+        type: 'recovery_waiting',
+      );
+    }
+
     await _checkAndCompleteRecovery(recoveryId);
   }
+
+  // ------------------------------------------------------------
+  // CREATE RECOVERY SUCCESS NOTIFICATIONS
+  // ------------------------------------------------------------
+
+  Future<void> _createRecoverySuccessNotifications({
+    required String ownerId,
+    required String finderId,
+  }) async {
+    await _createSafeNotification(
+      userId: ownerId,
+      title: 'Recovery Successful',
+      message:
+          'Both you and the finder have confirmed the item return. '
+          'The recovery is now completed.',
+      type: 'recovery_success',
+    );
+
+    await _createSafeNotification(
+      userId: finderId,
+      title: 'Recovery Successful',
+      message:
+          'Both you and the owner have confirmed the item return. '
+          'The recovery is now completed.',
+      type: 'recovery_success',
+    );
+  }
+
+  // ------------------------------------------------------------
+  // SAFE NOTIFICATION CREATION
+  // ------------------------------------------------------------
+  //
+  // Notification failure must never stop the actual recovery
+  // confirmation process.
+  // ------------------------------------------------------------
+
+  Future<void> _createSafeNotification({
+    required String userId,
+    required String title,
+    required String message,
+    required String type,
+  }) async {
+    try {
+      await _notificationService.createNotification(
+        userId: userId,
+        title: title,
+        message: message,
+        type: type,
+      );
+    } catch (_) {
+      // Keep recovery flow working even if notification creation
+      // temporarily fails.
+    }
+  }
+
+  // ------------------------------------------------------------
+  // CHECK AND COMPLETE RECOVERY
+  // ------------------------------------------------------------
 
   Future<void> _checkAndCompleteRecovery(
     String recoveryId,
@@ -423,6 +607,10 @@ class RecoveryService {
     });
   }
 
+  // ------------------------------------------------------------
+  // USER RECOVERIES
+  // ------------------------------------------------------------
+
   Stream<QuerySnapshot<Map<String, dynamic>>> getUserRecoveries(
     String userId,
   ) {
@@ -445,6 +633,10 @@ class RecoveryService {
         )
         .snapshots();
   }
+
+  // ------------------------------------------------------------
+  // PENDING RECOVERIES
+  // ------------------------------------------------------------
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getPendingRecoveries(
     String userId,
@@ -473,6 +665,10 @@ class RecoveryService {
         .snapshots();
   }
 
+  // ------------------------------------------------------------
+  // COMPLETED RECOVERIES
+  // ------------------------------------------------------------
+
   Stream<QuerySnapshot<Map<String, dynamic>>>
       getCompletedRecoveries(
     String userId,
@@ -500,6 +696,10 @@ class RecoveryService {
         )
         .snapshots();
   }
+
+  // ------------------------------------------------------------
+  // CANCEL RECOVERY
+  // ------------------------------------------------------------
 
   Future<void> cancelRecovery(
     String recoveryId,
@@ -577,6 +777,10 @@ class RecoveryService {
     }
   }
 
+  // ------------------------------------------------------------
+  // DELETE RECOVERY
+  // ------------------------------------------------------------
+
   Future<void> deleteRecovery(
     String recoveryId,
   ) async {
@@ -618,11 +822,19 @@ class RecoveryService {
     );
   }
 
+  // ------------------------------------------------------------
+  // GET POST
+  // ------------------------------------------------------------
+
   Future<DocumentSnapshot<Map<String, dynamic>>> getPost(
     String postId,
   ) {
     return _posts.doc(postId).get();
   }
+
+  // ------------------------------------------------------------
+  // CHECK RECOVERY EXISTS
+  // ------------------------------------------------------------
 
   Future<bool> recoveryExists({
     required String lostPostId,

@@ -5,6 +5,8 @@ import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../services/notification_service.dart';
+
 class ValuableVerificationScreen extends StatefulWidget {
   final String postId;
   final String itemName;
@@ -27,6 +29,9 @@ class _ValuableVerificationScreenState
 
   final FirebaseAuth _auth =
       FirebaseAuth.instance;
+
+  final NotificationService _notificationService =
+      NotificationService();
 
   final List<TextEditingController> _controllers =
       List.generate(
@@ -78,6 +83,72 @@ class _ValuableVerificationScreenState
           ),
         )
         .toString();
+  }
+
+  // ============================================================
+  // CREATE NOTIFICATION SAFELY
+  // ============================================================
+
+  Future<void> _createSafeNotification({
+    required String userId,
+    required String title,
+    required String message,
+    required String type,
+  }) async {
+    if (userId.trim().isEmpty) {
+      return;
+    }
+
+    try {
+      await _notificationService.createNotification(
+        userId: userId,
+        title: title,
+        message: message,
+        type: type,
+      );
+    } catch (e) {
+      debugPrint(
+        'Notification creation failed: $e',
+      );
+    }
+  }
+
+  // ============================================================
+  // SEND OWNER VERIFICATION SUCCESS NOTIFICATIONS
+  // ============================================================
+
+  Future<void> _sendVerificationSuccessNotifications({
+    required String ownerId,
+    required String finderId,
+  }) async {
+    // ----------------------------------------------------------
+    // LOST PERSON / OWNER
+    // ----------------------------------------------------------
+
+    await _createSafeNotification(
+      userId: ownerId,
+      title: 'Ownership Verification Successful',
+      message:
+          'Your ownership verification was successful. '
+          'You can now continue with the item return process.',
+      type: 'ownership_verification',
+    );
+
+    // ----------------------------------------------------------
+    // FINDER
+    // ----------------------------------------------------------
+
+    if (finderId.isNotEmpty &&
+        finderId != ownerId) {
+      await _createSafeNotification(
+        userId: finderId,
+        title: 'Ownership Verification Successful',
+        message:
+            'The lost person has successfully completed '
+            'ownership verification for your found valuable item.',
+        type: 'ownership_verification',
+      );
+    }
   }
 
   // ============================================================
@@ -184,7 +255,44 @@ class _ValuableVerificationScreenState
 
       if (verified) {
         // ------------------------------------------------------
+        // GET FOUND POST
+        // ------------------------------------------------------
+
+        final DocumentSnapshot<
+            Map<String, dynamic>> postSnapshot =
+            await _firestore
+                .collection('posts')
+                .doc(widget.postId)
+                .get();
+
+        if (!postSnapshot.exists) {
+          throw Exception(
+            'The found item post could not be found.',
+          );
+        }
+
+        final Map<String, dynamic> postData =
+            postSnapshot.data() ?? {};
+
+        // The person who created the Found valuable post
+        // is the finder.
+        final String finderId =
+            postData['userId']?.toString() ?? '';
+
+        // ------------------------------------------------------
         // SAVE VERIFIED OWNER
+        // ------------------------------------------------------
+        //
+        // IMPORTANT:
+        // The project uses "verifiedUserId" in the recovery
+        // and post-details logic, and the Firestore rule also
+        // expects "verifiedUserId".
+        //
+        // Do not use "verifiedOwnerId" here.
+        //
+        // Also, recoveryStatus is intentionally NOT updated here.
+        // Recovery starts only when the user explicitly chooses
+        // Continue Item Return.
         // ------------------------------------------------------
 
         await _firestore
@@ -192,17 +300,28 @@ class _ValuableVerificationScreenState
             .doc(widget.postId)
             .update({
           'ownerVerified': true,
-          'verifiedOwnerId': currentUser.uid,
+          'verifiedUserId':
+              currentUser.uid,
           'verifiedAt':
               FieldValue.serverTimestamp(),
-          'verificationStatus': 'verified',
-          'recoveryStatus':
-              'verification_completed',
+          'verificationStatus':
+              'verified',
           'updatedAt':
               FieldValue.serverTimestamp(),
         });
 
-        if (!mounted) return;
+        // ------------------------------------------------------
+        // SEND NOTIFICATIONS
+        // ------------------------------------------------------
+
+        await _sendVerificationSuccessNotifications(
+          ownerId: currentUser.uid,
+          finderId: finderId,
+        );
+
+        if (!mounted) {
+          return;
+        }
 
         // ------------------------------------------------------
         // SUCCESS DIALOG
@@ -237,7 +356,9 @@ class _ValuableVerificationScreenState
                       Navigator.pop(
                     dialogContext,
                   ),
-                  child: const Text('Continue'),
+                  child: const Text(
+                    'Continue',
+                  ),
                 ),
               ],
             );
@@ -259,7 +380,9 @@ class _ValuableVerificationScreenState
         // VERIFICATION FAILED
         // ------------------------------------------------------
 
-        if (!mounted) return;
+        if (!mounted) {
+          return;
+        }
 
         await showDialog<void>(
           context: context,
@@ -289,7 +412,9 @@ class _ValuableVerificationScreenState
                       Navigator.pop(
                     dialogContext,
                   ),
-                  child: const Text('Try Again'),
+                  child: const Text(
+                    'Try Again',
+                  ),
                 ),
               ],
             );
@@ -297,7 +422,9 @@ class _ValuableVerificationScreenState
         );
       }
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -358,7 +485,8 @@ class _ValuableVerificationScreenState
                 'Claim: ${widget.itemName}',
                 style: const TextStyle(
                   fontSize: 22,
-                  fontWeight: FontWeight.bold,
+                  fontWeight:
+                      FontWeight.bold,
                 ),
               ),
 
@@ -438,7 +566,8 @@ class _ValuableVerificationScreenState
                           'Question ${index + 1}',
                       hintText:
                           _questions[index],
-                      alignLabelWithHint: true,
+                      alignLabelWithHint:
+                          true,
                       border:
                           const OutlineInputBorder(),
                       focusedBorder:
@@ -499,7 +628,8 @@ class _ValuableVerificationScreenState
                 child: Text(
                   'Your answers are checked against '
                   'the private item information.',
-                  textAlign: TextAlign.center,
+                  textAlign:
+                      TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
                     color:
