@@ -18,11 +18,26 @@ import '../../screens/items/my_items_screen.dart';
 import '../../screens/items/create_post_screen.dart';
 import '../../screens/items/post_details_screen.dart';
 
+import '../../screens/admin/admin_home_screen.dart';
+import '../../screens/admin/admin_users_screen.dart';
+import '../../screens/admin/admin_lost_posts_screen.dart';
+import '../../screens/admin/admin_found_posts_screen.dart';
+import '../../screens/admin/admin_completed_posts_screen.dart';
+
 class AppRoutes {
   static const String login = '/login';
   static const String register = '/register';
   static const String adminLogin = '/admin-login';
 
+  // Admin routes
+  static const String adminHome = '/admin-home';
+  static const String adminUsers = '/admin-users';
+  static const String adminLostPosts = '/admin-lost-posts';
+  static const String adminFoundPosts = '/admin-found-posts';
+  static const String adminCompletedPosts =
+      '/admin-completed-posts';
+
+  // User routes
   static const String home = '/home';
   static const String account = '/account';
   static const String about = '/about';
@@ -39,6 +54,10 @@ class AppRoutes {
     RouteSettings settings,
   ) {
     switch (settings.name) {
+      // -------------------------
+      // Authentication
+      // -------------------------
+
       case login:
         return MaterialPageRoute(
           builder: (_) => const LoginScreen(),
@@ -53,6 +72,40 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (_) => const AdminLoginScreen(),
         );
+
+      // -------------------------
+      // Admin
+      // -------------------------
+
+      case adminHome:
+        return MaterialPageRoute(
+          builder: (_) => const AdminHomeScreen(),
+        );
+
+      case adminUsers:
+        return MaterialPageRoute(
+          builder: (_) => const AdminUsersScreen(),
+        );
+
+      case adminLostPosts:
+        return MaterialPageRoute(
+          builder: (_) => const AdminLostPostsScreen(),
+        );
+
+      case adminFoundPosts:
+        return MaterialPageRoute(
+          builder: (_) => const AdminFoundPostsScreen(),
+        );
+
+      case adminCompletedPosts:
+        return MaterialPageRoute(
+          builder: (_) =>
+              const AdminCompletedPostsScreen(),
+        );
+
+      // -------------------------
+      // User
+      // -------------------------
 
       case home:
         return MaterialPageRoute(
@@ -71,7 +124,7 @@ class AppRoutes {
 
       case notifications:
         return MaterialPageRoute(
-          builder: (_) =>  NotificationsScreen(),
+          builder: (_) => NotificationsScreen(),
         );
 
       case lostItems:
@@ -100,13 +153,18 @@ class AppRoutes {
         );
 
       case postDetails:
-        final post = settings.arguments as Map<String, dynamic>;
+        final post =
+            settings.arguments as Map<String, dynamic>;
 
         return MaterialPageRoute(
           builder: (_) => PostDetailsScreen(
             post: post,
           ),
         );
+
+      // -------------------------
+      // Unknown route
+      // -------------------------
 
       default:
         return _errorRoute(

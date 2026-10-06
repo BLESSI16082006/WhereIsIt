@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class AdminLoginScreen extends StatefulWidget {
@@ -10,8 +12,11 @@ class AdminLoginScreen extends StatefulWidget {
 class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController =
+      TextEditingController();
+
+  final TextEditingController _passwordController =
+      TextEditingController();
 
   bool _obscurePassword = true;
   bool _isLoading = false;
@@ -44,20 +49,116 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     });
 
     try {
-      // Firebase authentication will be connected through
-      // AuthProvider and FirebaseAuthService later.
+      // ----------------------------------------------------------
+      // FIREBASE AUTHENTICATION
+      // ----------------------------------------------------------
 
-      await Future.delayed(const Duration(seconds: 1));
+      final UserCredential credential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      final User? user = credential.user;
+
+      if (user == null) {
+        throw Exception('Unable to identify administrator.');
+      }
+
+      // ----------------------------------------------------------
+      // CHECK ADMIN ROLE
+      // ----------------------------------------------------------
+
+      final DocumentSnapshot<Map<String, dynamic>> userDocument =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
+
+      if (!userDocument.exists) {
+        await FirebaseAuth.instance.signOut();
+
+        if (!mounted) return;
+
+        _showMessage(
+          'Administrator account details were not found.',
+          isError: true,
+        );
+
+        return;
+      }
+
+      final Map<String, dynamic> userData =
+          userDocument.data() ?? {};
+
+      final String role =
+          userData['role']?.toString().toLowerCase().trim() ?? '';
+
+      if (role != 'admin') {
+        await FirebaseAuth.instance.signOut();
+
+        if (!mounted) return;
+
+        _showMessage(
+          'Access denied. This account is not an administrator.',
+          isError: true,
+        );
+
+        return;
+      }
+
+      // ----------------------------------------------------------
+      // ADMIN LOGIN SUCCESSFUL
+      // ----------------------------------------------------------
 
       if (!mounted) return;
 
-      _showMessage(
-        'Admin login form validated successfully.',
-        isError: false,
+      Navigator.pushReplacementNamed(
+        context,
+        '/admin-home',
       );
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
 
-      // Later:
-      // Navigator.pushReplacementNamed(context, '/admin-home');
+      String message;
+
+      switch (e.code) {
+        case 'user-not-found':
+          message = 'No account found with this email.';
+          break;
+
+        case 'wrong-password':
+        case 'invalid-credential':
+          message = 'Incorrect email or password.';
+          break;
+
+        case 'invalid-email':
+          message = 'Please enter a valid email address.';
+          break;
+
+        case 'user-disabled':
+          message = 'This account has been disabled.';
+          break;
+
+        case 'too-many-requests':
+          message =
+              'Too many login attempts. Please try again later.';
+          break;
+
+        case 'network-request-failed':
+          message =
+              'Network error. Please check your internet connection.';
+          break;
+
+        default:
+          message =
+              e.message ?? 'Unable to sign in. Please try again.';
+      }
+
+      _showMessage(
+        message,
+        isError: true,
+      );
     } catch (e) {
       if (!mounted) return;
 
@@ -148,7 +249,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-
           prefixIcon: Container(
             margin: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -160,27 +260,21 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
               color: accentColor,
             ),
           ),
-
           suffixIcon: suffixIcon,
-
           labelStyle: TextStyle(
             color: Colors.grey.shade600,
           ),
-
           hintStyle: TextStyle(
             color: Colors.grey.shade400,
           ),
-
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: BorderSide.none,
           ),
-
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: BorderSide.none,
           ),
-
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: const BorderSide(
@@ -188,14 +282,12 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
               width: 2,
             ),
           ),
-
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: const BorderSide(
               color: Colors.red,
             ),
           ),
-
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: const BorderSide(
@@ -203,7 +295,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
               width: 2,
             ),
           ),
-
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 20,
@@ -221,7 +312,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
-
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -263,7 +353,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
                     const SizedBox(height: 5),
 
-                    // Admin icon
                     Container(
                       width: 95,
                       height: 95,
@@ -314,7 +403,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 child: Form(
                   key: _formKey,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: 8),
 
@@ -324,9 +414,11 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         label: 'Admin Email',
                         hint: 'Enter administrator email',
                         icon: Icons.email_outlined,
-                        keyboardType: TextInputType.emailAddress,
+                        keyboardType:
+                            TextInputType.emailAddress,
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
+                          if (value == null ||
+                              value.trim().isEmpty) {
                             return 'Please enter admin email';
                           }
 
@@ -334,7 +426,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                             r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
                           );
 
-                          if (!emailRegex.hasMatch(value.trim())) {
+                          if (!emailRegex.hasMatch(
+                            value.trim(),
+                          )) {
                             return 'Please enter a valid email';
                           }
 
@@ -354,7 +448,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         suffixIcon: IconButton(
                           onPressed: () {
                             setState(() {
-                              _obscurePassword = !_obscurePassword;
+                              _obscurePassword =
+                                  !_obscurePassword;
                             });
                           },
                           icon: Icon(
@@ -365,7 +460,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                           ),
                         ),
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
+                          if (value == null ||
+                              value.isEmpty) {
                             return 'Please enter your password';
                           }
 
@@ -386,7 +482,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       SizedBox(
                         height: 58,
                         child: ElevatedButton(
-                          onPressed: _isLoading ? null : _adminLogin,
+                          onPressed:
+                              _isLoading ? null : _adminLogin,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: accentColor,
                             disabledBackgroundColor:
@@ -394,17 +491,20 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                             foregroundColor: Colors.white,
                             elevation: 5,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
+                              borderRadius:
+                                  BorderRadius.circular(18),
                             ),
                           ),
                           child: _isLoading
                               ? const SizedBox(
                                   width: 25,
                                   height: 25,
-                                  child: CircularProgressIndicator(
+                                  child:
+                                      CircularProgressIndicator(
                                     strokeWidth: 3,
                                     valueColor:
-                                        AlwaysStoppedAnimation<Color>(
+                                        AlwaysStoppedAnimation<
+                                            Color>(
                                       Colors.white,
                                     ),
                                   ),
@@ -414,14 +514,16 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                                       MainAxisAlignment.center,
                                   children: [
                                     Icon(
-                                      Icons.admin_panel_settings_outlined,
+                                      Icons
+                                          .admin_panel_settings_outlined,
                                     ),
                                     SizedBox(width: 10),
                                     Text(
                                       'Admin Sign In',
                                       style: TextStyle(
                                         fontSize: 18,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight:
+                                            FontWeight.bold,
                                       ),
                                     ),
                                   ],
@@ -438,14 +540,18 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.orange.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(16),
+                          color:
+                              Colors.orange.withOpacity(0.08),
+                          borderRadius:
+                              BorderRadius.circular(16),
                           border: Border.all(
-                            color: Colors.orange.withOpacity(0.35),
+                            color:
+                                Colors.orange.withOpacity(0.35),
                           ),
                         ),
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
                           children: [
                             Icon(
                               Icons.security_outlined,
@@ -475,7 +581,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       // ------------------------------------------------
 
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment:
+                            MainAxisAlignment.center,
                         children: [
                           Text(
                             'Are you a user? ',
