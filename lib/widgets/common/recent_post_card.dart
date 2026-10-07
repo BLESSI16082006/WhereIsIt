@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class RecentPostCard extends StatelessWidget {
@@ -62,14 +63,14 @@ class RecentPostCard extends StatelessWidget {
                     width: 52,
                     height: 52,
                     decoration: BoxDecoration(
-                      color: Colors.teal.shade50,
+                      color: AppColors.blueSoft,
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Icon(
                       isLost
                           ? Icons.search_off_rounded
                           : Icons.search_rounded,
-                      color: Colors.teal.shade700,
+                      color: AppColors.primaryBlue,
                       size: 28,
                     ),
                   ),
@@ -102,7 +103,7 @@ class RecentPostCard extends StatelessWidget {
                             category,
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.grey.shade600,
+                              color: AppColors.secondaryText,
                             ),
                           ),
                         ],
@@ -123,8 +124,8 @@ class RecentPostCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: isLost
-                          ? Colors.red.shade50
-                          : Colors.green.shade50,
+                          ? AppColors.errorSoft
+                          : AppColors.successSoft,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -133,8 +134,8 @@ class RecentPostCard extends StatelessWidget {
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: isLost
-                            ? Colors.red.shade700
-                            : Colors.green.shade700,
+                            ? AppColors.error
+                            : AppColors.success,
                       ),
                     ),
                   ),
@@ -153,7 +154,7 @@ class RecentPostCard extends StatelessWidget {
                     Icon(
                       Icons.location_on_outlined,
                       size: 19,
-                      color: Colors.grey.shade600,
+                      color: AppColors.secondaryText,
                     ),
                     const SizedBox(width: 6),
                     Expanded(
@@ -162,7 +163,7 @@ class RecentPostCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey.shade700,
+                          color: AppColors.primaryText,
                         ),
                       ),
                     ),
@@ -185,7 +186,7 @@ class RecentPostCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.4,
-                    color: Colors.grey.shade700,
+                    color: AppColors.primaryText,
                   ),
                 ),
               ],
@@ -203,10 +204,10 @@ class RecentPostCard extends StatelessWidget {
                     vertical: 9,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
+                    color: AppColors.blueSoft,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: Colors.blue.shade100,
+                      color: AppColors.blueSoft,
                     ),
                   ),
                   child: Row(
@@ -214,7 +215,7 @@ class RecentPostCard extends StatelessWidget {
                       Icon(
                         Icons.lock_outline,
                         size: 17,
-                        color: Colors.blue.shade700,
+                        color: AppColors.primaryBlue,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -222,7 +223,7 @@ class RecentPostCard extends StatelessWidget {
                           'Some item details are private for verification.',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.blue.shade800,
+                            color: AppColors.primaryBlue,
                           ),
                         ),
                       ),
@@ -245,14 +246,14 @@ class RecentPostCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Colors.teal.shade700,
+                      color: AppColors.primaryBlue,
                     ),
                   ),
                   const SizedBox(width: 4),
                   Icon(
                     Icons.arrow_forward_rounded,
                     size: 18,
-                    color: Colors.teal.shade700,
+                    color: AppColors.primaryBlue,
                   ),
                 ],
               ),

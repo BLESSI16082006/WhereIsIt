@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -297,13 +298,13 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.teal.shade50,
+                            color: AppColors.blueSoft,
                           ),
 
                           child: Icon(
                             Icons.person,
                             size: 50,
-                            color: Colors.teal.shade700,
+                            color: AppColors.primaryBlue,
                           ),
                         ),
 
@@ -325,7 +326,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                         Text(
                           _email,
                           style: TextStyle(
-                            color: Colors.grey.shade600,
+                            color: AppColors.secondaryText,
                           ),
                         ),
                       ],
@@ -478,7 +479,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                     child:
                                         CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: Colors.white,
+                                      color: AppColors.card,
                                     ),
                                   )
                                 : const Icon(
@@ -500,7 +501,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                               ),
 
                               backgroundColor:
-                                  Colors.green,
+                                  AppColors.success,
 
                               foregroundColor:
                                   Colors.white,

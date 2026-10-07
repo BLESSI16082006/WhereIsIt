@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -278,8 +279,8 @@ class _EditPostScreenState
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: postType == 'Lost'
-                        ? Colors.orange.shade50
-                        : Colors.green.shade50,
+                        ? AppColors.warningSoft
+                        : AppColors.successSoft,
                     borderRadius:
                         BorderRadius.circular(14),
                   ),
@@ -290,8 +291,8 @@ class _EditPostScreenState
                             ? Icons.search_off_rounded
                             : Icons.search_rounded,
                         color: postType == 'Lost'
-                            ? Colors.orange.shade700
-                            : Colors.green.shade700,
+                            ? AppColors.warning
+                            : AppColors.success,
                       ),
                       const SizedBox(width: 10),
                       Text(
@@ -300,8 +301,8 @@ class _EditPostScreenState
                           fontWeight:
                               FontWeight.bold,
                           color: postType == 'Lost'
-                              ? Colors.orange.shade800
-                              : Colors.green.shade800,
+                              ? AppColors.warning
+                              : AppColors.success,
                         ),
                       ),
                       const Spacer(),
@@ -310,7 +311,7 @@ class _EditPostScreenState
                         style: TextStyle(
                           fontSize: 11,
                           color:
-                              Colors.grey.shade600,
+                              AppColors.secondaryText,
                         ),
                       ),
                     ],
@@ -670,7 +671,7 @@ class _EditPostScreenState
                             child:
                                 CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.card,
                             ),
                           )
                         : const Icon(
@@ -698,7 +699,7 @@ class _EditPostScreenState
                   style: TextStyle(
                     fontSize: 12,
                     color:
-                        Colors.grey.shade600,
+                        AppColors.secondaryText,
                   ),
                 ),
               ],
@@ -733,7 +734,7 @@ class _EditPostScreenState
           subtitle,
           style: TextStyle(
             fontSize: 13,
-            color: Colors.grey.shade600,
+            color: AppColors.secondaryText,
           ),
         ),
       ],

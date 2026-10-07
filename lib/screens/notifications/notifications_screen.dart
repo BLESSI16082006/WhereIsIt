@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/notification_service.dart';
@@ -79,7 +80,7 @@ class NotificationsScreen extends StatelessWidget {
                     Icon(
                       Icons.notifications_off_outlined,
                       size: 60,
-                      color: Colors.grey.shade500,
+                      color: AppColors.secondaryText,
                     ),
                     const SizedBox(height: 16),
                     const Text(
@@ -95,7 +96,7 @@ class NotificationsScreen extends StatelessWidget {
                       'Please try again later.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: AppColors.secondaryText,
                       ),
                     ),
                   ],
@@ -189,13 +190,13 @@ class NotificationsScreen extends StatelessWidget {
               width: 90,
               height: 90,
               decoration: BoxDecoration(
-                color: Colors.teal.withValues(alpha: 0.10),
+                color: AppColors.blueSoft,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.notifications_none_rounded,
                 size: 48,
-                color: Colors.teal,
+                color: AppColors.primaryBlue,
               ),
             ),
 
@@ -218,7 +219,7 @@ class NotificationsScreen extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade600,
+                color: AppColors.secondaryText,
                 height: 1.5,
               ),
             ),
@@ -263,15 +264,15 @@ class _NotificationCard extends StatelessWidget {
 
           decoration: BoxDecoration(
             color: notification.isRead
-                ? Colors.white
-                : Colors.teal.withValues(alpha: 0.06),
+                ? AppColors.card
+                : AppColors.blueSoft,
 
             borderRadius: BorderRadius.circular(16),
 
             border: Border.all(
               color: notification.isRead
-                  ? Colors.grey.shade200
-                  : Colors.teal.withValues(alpha: 0.25),
+                  ? AppColors.border
+                  : AppColors.blueSoftStrong,
             ),
 
             boxShadow: [
@@ -344,7 +345,7 @@ class _NotificationCard extends StatelessWidget {
                               left: 8,
                             ),
                             decoration: const BoxDecoration(
-                              color: Colors.teal,
+                              color: AppColors.primaryBlue,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -357,7 +358,7 @@ class _NotificationCard extends StatelessWidget {
                       notification.message,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade700,
+                        color: AppColors.primaryText,
                         height: 1.4,
                       ),
                     ),
@@ -370,7 +371,7 @@ class _NotificationCard extends StatelessWidget {
                       ),
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade500,
+                        color: AppColors.secondaryText,
                       ),
                     ),
                   ],
@@ -419,25 +420,25 @@ class _NotificationCard extends StatelessWidget {
   Color _getNotificationColor(String type) {
     switch (type) {
       case 'account_created':
-        return Colors.blue;
+        return AppColors.primaryBlue;
 
       case 'item_confirmation':
-        return Colors.orange;
+        return AppColors.warning;
 
       case 'recovery_confirmation':
-        return Colors.deepPurple;
+        return AppColors.primaryBlue;
 
       case 'recovery_waiting':
-        return Colors.amber.shade800;
+        return AppColors.warning;
 
       case 'recovery_success':
-        return Colors.green;
+        return AppColors.success;
 
       case 'ownership_verification':
-        return Colors.teal;
+        return AppColors.primaryBlue;
 
       default:
-        return Colors.blueGrey;
+        return AppColors.primaryBlue;
     }
   }
 

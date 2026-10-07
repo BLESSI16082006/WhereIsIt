@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -34,10 +35,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
 
-  static const Color primaryColor = Color(0xFF111111);
-  static const Color accentColor = Color(0xFF00A6A6);
-  static const Color backgroundColor = Color(0xFFF5F5F5);
-  static const Color fieldColor = Colors.white;
+  static const Color primaryColor = AppColors.background;
+  static const Color accentColor = AppColors.primaryBlue;
+  static const Color backgroundColor = AppColors.background;
+  static const Color fieldColor = AppColors.card;
 
   @override
   void dispose() {
@@ -226,7 +227,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ],
         ),
         backgroundColor:
-            isError ? Colors.red.shade700 : Colors.green.shade700,
+            isError ? AppColors.error : AppColors.success,
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
         shape: RoundedRectangleBorder(
@@ -268,7 +269,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         keyboardType: keyboardType,
         validator: validator,
         style: const TextStyle(
-          color: primaryColor,
+          color: AppColors.primaryText,
           fontSize: 16,
           fontWeight: FontWeight.w500,
         ),
@@ -291,11 +292,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           suffixIcon: suffixIcon,
 
           labelStyle: TextStyle(
-            color: Colors.grey.shade600,
+            color: AppColors.secondaryText,
           ),
 
           hintStyle: TextStyle(
-            color: Colors.grey.shade400,
+            color: AppColors.secondaryText,
           ),
 
           border: OutlineInputBorder(
@@ -319,14 +320,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: const BorderSide(
-              color: Colors.red,
+              color: AppColors.error,
             ),
           ),
 
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: const BorderSide(
-              color: Colors.red,
+              color: AppColors.error,
               width: 2,
             ),
           ),
@@ -366,7 +367,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   30,
                 ),
                 decoration: const BoxDecoration(
-                  color: primaryColor,
+                  color: AppColors.background,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(35),
                     bottomRight: Radius.circular(35),
@@ -382,7 +383,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         },
                         icon: const Icon(
                           Icons.arrow_back,
-                          color: Colors.white,
+                          color: AppColors.card,
                           size: 28,
                         ),
                       ),
@@ -397,7 +398,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.white,
+                          color: AppColors.card,
                           width: 4,
                         ),
                       ),
@@ -424,7 +425,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Text(
                       'Join WhereIsIt',
                       style: TextStyle(
-                        color: Colors.grey.shade300,
+                        color: AppColors.border,
                         fontSize: 15,
                       ),
                     ),
@@ -544,7 +545,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             _obscurePassword
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
-                            color: Colors.grey.shade600,
+                            color: AppColors.secondaryText,
                           ),
                         ),
                         validator: (value) {
@@ -583,7 +584,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             _obscureConfirmPassword
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
-                            color: Colors.grey.shade600,
+                            color: AppColors.secondaryText,
                           ),
                         ),
                         validator: (value) {
@@ -671,7 +672,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Text(
                             'Already have an account? ',
                             style: TextStyle(
-                              color: Colors.grey.shade700,
+                              color: AppColors.primaryText,
                               fontSize: 15,
                             ),
                           ),
@@ -704,13 +705,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Icon(
                             Icons.verified_user_outlined,
                             size: 17,
-                            color: Colors.grey.shade600,
+                            color: AppColors.secondaryText,
                           ),
                           const SizedBox(width: 6),
                           Text(
                             'Your information is securely handled',
                             style: TextStyle(
-                              color: Colors.grey.shade600,
+                              color: AppColors.secondaryText,
                               fontSize: 12,
                             ),
                           ),

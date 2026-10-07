@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,9 +22,9 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
 
   String _searchText = '';
 
-  static const Color primaryColor = Color(0xFF111111);
-  static const Color accentColor = Color(0xFF00A6A6);
-  static const Color backgroundColor = Color(0xFFF5F5F5);
+  static const Color primaryColor = AppColors.primaryBlue;
+  static const Color accentColor = AppColors.primaryBlue;
+  static const Color backgroundColor = AppColors.background;
 
   @override
   void initState() {
@@ -226,7 +227,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                 Text(
                   'User ID',
                   style: TextStyle(
-                    color: Colors.grey.shade600,
+                    color: AppColors.secondaryText,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -263,7 +264,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade700,
+                  backgroundColor: AppColors.error,
                   foregroundColor: Colors.white,
                 ),
                 icon: const Icon(
@@ -301,7 +302,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
             child: Text(
               label,
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: AppColors.secondaryText,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
@@ -384,7 +385,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor:
-                    Colors.red.shade700,
+                    AppColors.error,
                 foregroundColor: Colors.white,
               ),
               child: const Text(
@@ -464,7 +465,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
               isError
                   ? Icons.error_outline
                   : Icons.check_circle_outline,
-              color: Colors.white,
+              color: AppColors.card,
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -473,8 +474,8 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
           ],
         ),
         backgroundColor: isError
-            ? Colors.red.shade700
-            : Colors.green.shade700,
+            ? AppColors.error
+            : AppColors.success,
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
         shape: RoundedRectangleBorder(
@@ -487,7 +488,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   Widget _buildSearchBar() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -502,7 +503,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         decoration: InputDecoration(
           hintText: 'Search users by name, email or phone',
           hintStyle: TextStyle(
-            color: Colors.grey.shade500,
+            color: AppColors.secondaryText,
             fontSize: 13,
           ),
           prefixIcon: const Icon(
@@ -581,7 +582,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         bottom: 14,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -605,7 +606,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                 height: 54,
                 decoration: BoxDecoration(
                   color: isAdmin
-                      ? Colors.orange.withOpacity(0.12)
+                      ? AppColors.warning.withOpacity(0.12)
                       : accentColor.withOpacity(0.12),
                   shape: BoxShape.circle,
                 ),
@@ -614,7 +615,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                       ? Icons.admin_panel_settings_outlined
                       : Icons.person_outline,
                   color: isAdmin
-                      ? Colors.orange.shade700
+                      ? AppColors.warning
                       : accentColor,
                   size: 28,
                 ),
@@ -650,7 +651,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.orange
+                              color: AppColors.warning
                                   .withOpacity(0.12),
                               borderRadius:
                                   BorderRadius.circular(8),
@@ -659,7 +660,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                               'ADMIN',
                               style: TextStyle(
                                 color:
-                                    Colors.orange.shade800,
+                                    AppColors.warning,
                                 fontSize: 9,
                                 fontWeight:
                                     FontWeight.bold,
@@ -675,7 +676,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: AppColors.secondaryText,
                         fontSize: 13,
                       ),
                     ),
@@ -685,7 +686,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Colors.grey.shade500,
+                        color: AppColors.secondaryText,
                         fontSize: 12,
                       ),
                     ),
@@ -699,7 +700,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                     : Icons.arrow_forward_ios_rounded,
                 color: isCurrentAdmin
                     ? accentColor
-                    : Colors.grey.shade400,
+                    : AppColors.secondaryText,
                 size: isCurrentAdmin ? 23 : 16,
               ),
             ],
@@ -750,7 +751,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: AppColors.secondaryText,
                 fontSize: 13,
                 height: 1.4,
               ),
@@ -794,7 +795,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                 const Text(
                   'User Accounts',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.card,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -803,7 +804,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                 Text(
                   'View registered users and manage their account records.',
                   style: TextStyle(
-                    color: Colors.grey.shade300,
+                    color: AppColors.border,
                     fontSize: 13,
                   ),
                 ),

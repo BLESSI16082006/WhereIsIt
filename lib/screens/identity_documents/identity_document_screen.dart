@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class IdentityDocumentScreen extends StatefulWidget {
@@ -114,7 +115,7 @@ class _IdentityDocumentScreenState
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.teal.shade50,
+                  color: AppColors.blueSoft,
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Row(
@@ -123,7 +124,7 @@ class _IdentityDocumentScreenState
                   children: [
                     Icon(
                       Icons.badge_outlined,
-                      color: Colors.teal.shade700,
+                      color: AppColors.primaryBlue,
                       size: 30,
                     ),
                     const SizedBox(width: 12),
@@ -133,7 +134,7 @@ class _IdentityDocumentScreenState
                         'document. Provide accurate details '
                         'to help identify the rightful owner.',
                         style: TextStyle(
-                          color: Colors.teal.shade900,
+                          color: AppColors.primaryBlue,
                           height: 1.4,
                         ),
                       ),
@@ -300,7 +301,7 @@ class _IdentityDocumentScreenState
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Colors.grey.shade300,
+                    color: AppColors.border,
                   ),
                   borderRadius:
                       BorderRadius.circular(16),
@@ -310,7 +311,7 @@ class _IdentityDocumentScreenState
                     Icon(
                       Icons.image_outlined,
                       size: 42,
-                      color: Colors.grey.shade500,
+                      color: AppColors.secondaryText,
                     ),
                     const SizedBox(height: 10),
                     const Text(
@@ -325,7 +326,7 @@ class _IdentityDocumentScreenState
                       'in the next step.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: AppColors.secondaryText,
                         fontSize: 13,
                       ),
                     ),
@@ -387,13 +388,13 @@ class _IdentityDocumentScreenState
           50,
         ),
         backgroundColor:
-            selected ? Colors.teal.shade50 : null,
+            selected ? AppColors.blueSoft : null,
         foregroundColor:
-            selected ? Colors.teal.shade700 : null,
+            selected ? AppColors.primaryBlue : null,
         side: BorderSide(
           color: selected
-              ? Colors.teal.shade600
-              : Colors.grey.shade300,
+              ? AppColors.primaryBlue
+              : AppColors.border,
           width: selected ? 1.5 : 1,
         ),
         shape: RoundedRectangleBorder(

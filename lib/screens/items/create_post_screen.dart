@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -1025,7 +1026,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                           Icons.check_circle,
                           size: 18,
                           color:
-                              Colors.green.shade600,
+                              AppColors.success,
                         ),
                         const SizedBox(width: 8),
                         const Text(
@@ -1137,7 +1138,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                         Icon(
                           Icons
                               .verified_user_outlined,
-                          color: Colors.teal,
+                          color: AppColors.primaryBlue,
                         ),
                         SizedBox(width: 10),
                         Expanded(
@@ -1182,7 +1183,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                                 CircleAvatar(
                               radius: 12,
                               backgroundColor:
-                                  Colors.teal.shade100,
+                                  AppColors.blueSoft,
                               child: Text(
                                 '${index + 1}',
                                 style:
@@ -1191,7 +1192,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                                   fontWeight:
                                       FontWeight.bold,
                                   color:
-                                      Colors.teal.shade800,
+                                      AppColors.primaryBlue,
                                 ),
                               ),
                             ),
@@ -1233,7 +1234,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                                 CircularProgressIndicator(
                               strokeWidth: 2,
                               color:
-                                  Colors.white,
+                                  AppColors.card,
                             ),
                           )
                         : const Icon(
@@ -1269,7 +1270,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   style: TextStyle(
                     fontSize: 12,
                     color:
-                        Colors.grey.shade600,
+                        AppColors.secondaryText,
                   ),
                 ),
 
@@ -1313,14 +1314,14 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         ),
         decoration: BoxDecoration(
           color: selected
-              ? Colors.teal.shade50
-              : Colors.grey.shade50,
+              ? AppColors.blueSoft
+              : AppColors.card,
           borderRadius:
               BorderRadius.circular(16),
           border: Border.all(
             color: selected
-                ? Colors.teal.shade600
-                : Colors.grey.shade300,
+                ? AppColors.primaryBlue
+                : AppColors.border,
             width: selected ? 2 : 1,
           ),
         ),
@@ -1330,8 +1331,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               icon,
               size: 28,
               color: selected
-                  ? Colors.teal.shade700
-                  : Colors.grey.shade600,
+                  ? AppColors.primaryBlue
+                  : AppColors.secondaryText,
             ),
             const SizedBox(height: 8),
             Text(
@@ -1343,8 +1344,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     ? FontWeight.bold
                     : FontWeight.w500,
                 color: selected
-                    ? Colors.teal.shade800
-                    : Colors.grey.shade700,
+                    ? AppColors.primaryBlue
+                    : AppColors.primaryText,
               ),
             ),
           ],
@@ -1377,7 +1378,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           subtitle,
           style: TextStyle(
             fontSize: 13,
-            color: Colors.grey.shade600,
+            color: AppColors.secondaryText,
           ),
         ),
       ],
@@ -1403,14 +1404,14 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         width: double.infinity,
         height: 190,
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
+          color: AppColors.card,
           borderRadius:
               BorderRadius.circular(16),
           border: Border.all(
             color:
                 _selectedImageBytes != null
-                    ? Colors.green.shade400
-                    : Colors.grey.shade300,
+                    ? AppColors.success
+                    : AppColors.border,
             width:
                 _selectedImageBytes != null
                     ? 2
@@ -1428,7 +1429,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                         .add_photo_alternate_outlined,
                     size: 44,
                     color:
-                        Colors.grey.shade600,
+                        AppColors.secondaryText,
                   ),
                   const SizedBox(
                     height: 10,
@@ -1439,7 +1440,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       fontWeight:
                           FontWeight.w600,
                       color:
-                          Colors.grey.shade700,
+                          AppColors.primaryText,
                     ),
                   ),
                   const SizedBox(
@@ -1495,7 +1496,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                               const Icon(
                             Icons.close,
                             color:
-                                Colors.white,
+                                AppColors.card,
                             size: 20,
                           ),
                         ),
@@ -1534,7 +1535,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                           style:
                               const TextStyle(
                             color:
-                                Colors.white,
+                                AppColors.card,
                             fontSize: 12,
                           ),
                         ),

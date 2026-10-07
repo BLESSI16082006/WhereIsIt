@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -136,7 +137,7 @@ class _RecoveryConfirmationScreenState
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? Colors.red.shade700 : null,
+        backgroundColor: isError ? AppColors.error : null,
       ),
     );
   }
@@ -299,7 +300,7 @@ class _RecoveryConfirmationScreenState
                 'Recovery ID: $recoveryId',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey.shade500,
+                  color: AppColors.secondaryText,
                 ),
               ),
             ],
@@ -400,12 +401,12 @@ class _RecoveryConfirmationScreenState
         gradient: LinearGradient(
           colors: isCompleted
               ? [
-                  Colors.green.shade50,
-                  Colors.green.shade100,
+                  AppColors.successSoft,
+                  AppColors.successSoftStrong,
                 ]
               : [
-                  Colors.teal.shade50,
-                  Colors.blue.shade50,
+                  AppColors.blueSoft,
+                  AppColors.blueSoft,
                 ],
         ),
         borderRadius: BorderRadius.circular(20),
@@ -418,8 +419,8 @@ class _RecoveryConfirmationScreenState
                 : Icons.sync_alt_rounded,
             size: 58,
             color: isCompleted
-                ? Colors.green.shade600
-                : Colors.teal.shade600,
+                ? AppColors.success
+                : AppColors.primaryBlue,
           ),
           const SizedBox(height: 12),
           Text(
@@ -440,7 +441,7 @@ class _RecoveryConfirmationScreenState
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
-              color: Colors.grey.shade700,
+              color: AppColors.primaryText,
             ),
           ),
         ],
@@ -476,7 +477,7 @@ class _RecoveryConfirmationScreenState
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey,
+                color: AppColors.secondaryText,
               ),
             ),
             const SizedBox(height: 6),
@@ -492,7 +493,7 @@ class _RecoveryConfirmationScreenState
               Text(
                 category,
                 style: TextStyle(
-                  color: Colors.grey.shade600,
+                  color: AppColors.secondaryText,
                 ),
               ),
             ],
@@ -503,13 +504,13 @@ class _RecoveryConfirmationScreenState
                   Icon(
                     Icons.location_on_outlined,
                     size: 18,
-                    color: Colors.grey.shade600,
+                    color: AppColors.secondaryText,
                   ),
                   const SizedBox(width: 5),
                   Text(
                     location,
                     style: TextStyle(
-                      color: Colors.grey.shade700,
+                      color: AppColors.primaryText,
                     ),
                   ),
                 ],
@@ -566,13 +567,13 @@ class _RecoveryConfirmationScreenState
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: confirmed
-            ? Colors.green.shade50
-            : Colors.orange.shade50,
+            ? AppColors.successSoft
+            : AppColors.warningSoft,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: confirmed
-              ? Colors.green.shade200
-              : Colors.orange.shade200,
+              ? AppColors.successBorder
+              : AppColors.warningBorder,
         ),
       ),
       child: Row(
@@ -582,8 +583,8 @@ class _RecoveryConfirmationScreenState
                 ? Icons.check_circle
                 : Icons.pending_outlined,
             color: confirmed
-                ? Colors.green.shade600
-                : Colors.orange.shade600,
+                ? AppColors.success
+                : AppColors.warning,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -599,8 +600,8 @@ class _RecoveryConfirmationScreenState
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: confirmed
-                  ? Colors.green.shade700
-                  : Colors.orange.shade700,
+                  ? AppColors.success
+                  : AppColors.warning,
             ),
           ),
         ],
@@ -669,10 +670,10 @@ class _RecoveryConfirmationScreenState
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.green.shade50,
+        color: AppColors.successSoft,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.green.shade200,
+          color: AppColors.successBorder,
         ),
       ),
       child: Column(
@@ -680,7 +681,7 @@ class _RecoveryConfirmationScreenState
           Icon(
             Icons.verified_rounded,
             size: 50,
-            color: Colors.green.shade600,
+            color: AppColors.success,
           ),
           const SizedBox(height: 10),
           Text(
@@ -688,7 +689,7 @@ class _RecoveryConfirmationScreenState
             style: TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.bold,
-              color: Colors.green.shade800,
+              color: AppColors.success,
             ),
           ),
           const SizedBox(height: 6),
@@ -697,7 +698,7 @@ class _RecoveryConfirmationScreenState
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              color: Colors.green.shade800,
+              color: AppColors.success,
             ),
           ),
         ],
@@ -714,7 +715,7 @@ class _RecoveryConfirmationScreenState
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(18),
       ),
       child: const Text(
@@ -770,7 +771,7 @@ class _RecoveryConfirmationScreenState
             Icon(
               Icons.error_outline,
               size: 60,
-              color: Colors.red.shade400,
+              color: AppColors.error,
             ),
             const SizedBox(height: 14),
             const Text(

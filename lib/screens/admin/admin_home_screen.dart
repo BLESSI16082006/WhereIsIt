@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,9 +8,9 @@ import '../../core/routes/app_routes.dart';
 class AdminHomeScreen extends StatelessWidget {
   const AdminHomeScreen({super.key});
 
-  static const Color primaryColor = Color(0xFF111111);
-  static const Color accentColor = Color(0xFF00A6A6);
-  static const Color backgroundColor = Color(0xFFF5F5F5);
+  static const Color primaryColor = AppColors.primaryBlue;
+  static const Color accentColor = AppColors.primaryBlue;
+  static const Color backgroundColor = AppColors.background;
 
   Stream<int> _getUserCount() {
     return FirebaseFirestore.instance
@@ -63,7 +64,7 @@ class AdminHomeScreen extends StatelessWidget {
                 Navigator.pop(dialogContext, true);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade700,
+                backgroundColor: AppColors.error,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Logout'),
@@ -138,7 +139,7 @@ class AdminHomeScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(22),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.card,
                 borderRadius: BorderRadius.circular(22),
                 boxShadow: [
                   BoxShadow(
@@ -174,7 +175,7 @@ class AdminHomeScreen extends StatelessWidget {
                         const Icon(
                           Icons.arrow_forward_ios_rounded,
                           size: 17,
-                          color: Colors.grey,
+                          color: AppColors.secondaryText,
                         ),
                       ],
                     ),
@@ -200,7 +201,7 @@ class AdminHomeScreen extends StatelessWidget {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: AppColors.secondaryText,
                         fontSize: 12.5,
                       ),
                     ),
@@ -245,7 +246,7 @@ class AdminHomeScreen extends StatelessWidget {
             ),
             child: const Icon(
               Icons.admin_panel_settings_outlined,
-              color: Colors.white,
+              color: AppColors.card,
               size: 30,
             ),
           ),
@@ -266,7 +267,7 @@ class AdminHomeScreen extends StatelessWidget {
                 Text(
                   'WhereIsIt Administration',
                   style: TextStyle(
-                    color: Colors.white70,
+                    color: AppColors.secondaryText,
                     fontSize: 13,
                   ),
                 ),
@@ -312,7 +313,7 @@ class AdminHomeScreen extends StatelessWidget {
               'or posts. Administrator access is restricted '
               'to authorized accounts.',
               style: TextStyle(
-                color: Colors.grey.shade800,
+                color: AppColors.primaryText,
                 fontSize: 13,
                 height: 1.45,
               ),
@@ -350,7 +351,7 @@ class AdminHomeScreen extends StatelessWidget {
                     Text(
                       'Monitor your WhereIsIt application.',
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: AppColors.secondaryText,
                         fontSize: 14,
                       ),
                     ),
@@ -376,7 +377,7 @@ class AdminHomeScreen extends StatelessWidget {
                                     'Registered application users',
                                 icon:
                                     Icons.people_alt_outlined,
-                                iconColor: Colors.blue,
+                                iconColor: AppColors.primaryBlue,
                                 countStream:
                                     _getUserCount(),
                                 onTap: () =>
@@ -388,7 +389,7 @@ class AdminHomeScreen extends StatelessWidget {
                                 subtitle:
                                     'Reported lost items',
                                 icon: Icons.search_outlined,
-                                iconColor: Colors.orange,
+                                iconColor: AppColors.warning,
                                 countStream:
                                     _getLostPostCount(),
                                 onTap: () =>
@@ -413,7 +414,7 @@ class AdminHomeScreen extends StatelessWidget {
                                     'Successfully recovered items',
                                 icon:
                                     Icons.check_circle_outline,
-                                iconColor: Colors.green,
+                                iconColor: AppColors.success,
                                 countStream:
                                     _getCompletedPostCount(),
                                 onTap: () =>
@@ -431,7 +432,7 @@ class AdminHomeScreen extends StatelessWidget {
                                   'Registered application users',
                               icon:
                                   Icons.people_alt_outlined,
-                              iconColor: Colors.blue,
+                              iconColor: AppColors.primaryBlue,
                               countStream:
                                   _getUserCount(),
                               onTap: () =>
@@ -444,7 +445,7 @@ class AdminHomeScreen extends StatelessWidget {
                               subtitle:
                                   'Reported lost items',
                               icon: Icons.search_outlined,
-                              iconColor: Colors.orange,
+                              iconColor: AppColors.warning,
                               countStream:
                                   _getLostPostCount(),
                               onTap: () =>
@@ -472,7 +473,7 @@ class AdminHomeScreen extends StatelessWidget {
                                   'Successfully recovered items',
                               icon:
                                   Icons.check_circle_outline,
-                              iconColor: Colors.green,
+                              iconColor: AppColors.success,
                               countStream:
                                   _getCompletedPostCount(),
                               onTap: () =>

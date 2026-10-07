@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -164,7 +165,7 @@ class _AdminCompletedPostsScreenState
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor:
-                    Colors.red.shade700,
+                    AppColors.error,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Delete'),
@@ -191,7 +192,7 @@ class _AdminCompletedPostsScreenState
           content: Text(
             'Completed post deleted successfully.',
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -205,7 +206,7 @@ class _AdminCompletedPostsScreenState
                 ? 'Permission denied. Update Firestore rules for admin deletion.'
                 : 'Unable to delete the completed post.',
           ),
-          backgroundColor: Colors.red.shade700,
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -217,7 +218,7 @@ class _AdminCompletedPostsScreenState
           content: Text(
             'Unable to delete the completed post.',
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -445,7 +446,7 @@ class _AdminCompletedPostsScreenState
                             return Container(
                               height: 220,
                               color:
-                                  Colors.grey.shade200,
+                                  AppColors.border,
                               child:
                                   const Icon(
                                 Icons
@@ -464,7 +465,7 @@ class _AdminCompletedPostsScreenState
                       decoration:
                           BoxDecoration(
                         color:
-                            Colors.grey.shade100,
+                            AppColors.card,
                         borderRadius:
                             BorderRadius.circular(
                           16,
@@ -478,7 +479,7 @@ class _AdminCompletedPostsScreenState
                             Icons
                                 .image_not_supported_outlined,
                             size: 45,
-                            color: Colors.grey,
+                            color: AppColors.secondaryText,
                           ),
                           SizedBox(height: 8),
                           Text(
@@ -497,14 +498,14 @@ class _AdminCompletedPostsScreenState
                     decoration:
                         BoxDecoration(
                       color:
-                          Colors.green.shade50,
+                          AppColors.successSoft,
                       borderRadius:
                           BorderRadius.circular(
                         14,
                       ),
                       border: Border.all(
                         color:
-                            Colors.green.shade200,
+                            AppColors.successBorder,
                       ),
                     ),
                     child: Row(
@@ -513,7 +514,7 @@ class _AdminCompletedPostsScreenState
                           Icons
                               .check_circle_outline,
                           color:
-                              Colors.green.shade700,
+                              AppColors.success,
                         ),
                         const SizedBox(width: 10),
                         const Expanded(
@@ -618,7 +619,7 @@ class _AdminCompletedPostsScreenState
                     decoration:
                         BoxDecoration(
                       color:
-                          Colors.grey.shade100,
+                          AppColors.card,
                       borderRadius:
                           BorderRadius.circular(
                         14,
@@ -651,7 +652,7 @@ class _AdminCompletedPostsScreenState
                     style: TextStyle(
                       fontSize: 12,
                       color:
-                          Colors.grey.shade700,
+                          AppColors.primaryText,
                     ),
                   ),
 
@@ -681,7 +682,7 @@ class _AdminCompletedPostsScreenState
                       style:
                           ElevatedButton.styleFrom(
                         backgroundColor:
-                            Colors.red.shade700,
+                            AppColors.error,
                         foregroundColor:
                             Colors.white,
                         shape:
@@ -720,7 +721,7 @@ class _AdminCompletedPostsScreenState
               label,
               style: TextStyle(
                 color:
-                    Colors.grey.shade600,
+                    AppColors.secondaryText,
                 fontSize: 13,
                 fontWeight:
                     FontWeight.w600,
@@ -874,8 +875,7 @@ class _AdminCompletedPostsScreenState
                               color: postType
                                       .toLowerCase() ==
                                   'lost'
-                                  ? Colors.orange
-                                      .shade800
+                                  ? AppColors.warning
                                   : Colors.purple
                                       .shade800,
                               fontSize: 11,
@@ -910,7 +910,7 @@ class _AdminCompletedPostsScreenState
                               .location_on_outlined,
                           size: 15,
                           color:
-                              Colors.grey.shade600,
+                              AppColors.secondaryText,
                         ),
                         const SizedBox(width: 3),
                         Expanded(
@@ -935,7 +935,7 @@ class _AdminCompletedPostsScreenState
                       'Completed: $date',
                       style: TextStyle(
                         color:
-                            Colors.green.shade700,
+                            AppColors.success,
                         fontSize: 12,
                         fontWeight:
                             FontWeight.w600,
@@ -954,7 +954,7 @@ class _AdminCompletedPostsScreenState
                       decoration:
                           BoxDecoration(
                         color:
-                            Colors.green.shade50,
+                            AppColors.successSoft,
                         borderRadius:
                             BorderRadius.circular(
                           20,
@@ -964,7 +964,7 @@ class _AdminCompletedPostsScreenState
                         'Completed',
                         style: TextStyle(
                           color:
-                              Colors.green.shade700,
+                              AppColors.success,
                           fontSize: 11,
                           fontWeight:
                               FontWeight.bold,
@@ -979,7 +979,7 @@ class _AdminCompletedPostsScreenState
                 Icons
                     .arrow_forward_ios_rounded,
                 size: 16,
-                color: Colors.grey,
+                color: AppColors.secondaryText,
               ),
             ],
           ),
@@ -992,10 +992,10 @@ class _AdminCompletedPostsScreenState
     return Container(
       width: 82,
       height: 82,
-      color: Colors.grey.shade100,
+      color: AppColors.card,
       child: const Icon(
         Icons.check_circle_outline,
-        color: Colors.green,
+        color: AppColors.success,
         size: 34,
       ),
     );
@@ -1005,11 +1005,11 @@ class _AdminCompletedPostsScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-          const Color(0xFFF5F5F5),
+          AppColors.background,
 
       appBar: AppBar(
         backgroundColor:
-            const Color(0xFF111111),
+            AppColors.background,
         foregroundColor: Colors.white,
         title: const Text(
           'Completed Posts',
@@ -1029,7 +1029,7 @@ class _AdminCompletedPostsScreenState
               16,
               12,
             ),
-            color: Colors.white,
+            color: AppColors.card,
             child: TextField(
               controller:
                   _searchController,
@@ -1056,7 +1056,7 @@ class _AdminCompletedPostsScreenState
                         : null,
                 filled: true,
                 fillColor:
-                    Colors.grey.shade100,
+                    AppColors.card,
                 border:
                     OutlineInputBorder(
                   borderRadius:

@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -447,7 +448,7 @@ class MyItemsScreen extends StatelessWidget {
               },
               style:
                   ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.error,
                 foregroundColor:
                     Colors.white,
               ),
@@ -568,10 +569,10 @@ class MyItemsScreen extends StatelessWidget {
             BorderRadius.circular(18),
         side: BorderSide(
           color: isCompleted
-              ? Colors.green.shade300
+              ? AppColors.success
               : recoveryPending
-                  ? Colors.orange.shade300
-                  : Colors.grey.shade200,
+                  ? AppColors.warning
+                  : AppColors.border,
         ),
       ),
       child: InkWell(
@@ -690,7 +691,7 @@ class MyItemsScreen extends StatelessWidget {
                                       Icons
                                           .edit_outlined,
                                       color:
-                                          Colors.blue,
+                                          AppColors.primaryBlue,
                                     ),
                                     SizedBox(
                                       width: 10,
@@ -715,7 +716,7 @@ class MyItemsScreen extends StatelessWidget {
                                       Icons
                                           .check_circle_outline,
                                       color:
-                                          Colors.green,
+                                          AppColors.success,
                                     ),
                                     SizedBox(
                                       width: 10,
@@ -739,7 +740,7 @@ class MyItemsScreen extends StatelessWidget {
                                       Icons
                                           .delete_outline,
                                       color:
-                                          Colors.red,
+                                          AppColors.error,
                                     ),
                                     SizedBox(
                                       width: 10,
@@ -766,7 +767,7 @@ class MyItemsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           color:
-                              Colors.grey.shade600,
+                              AppColors.secondaryText,
                         ),
                       ),
 
@@ -782,7 +783,7 @@ class MyItemsScreen extends StatelessWidget {
                                 .location_on_outlined,
                             size: 16,
                             color:
-                                Colors.grey.shade600,
+                                AppColors.secondaryText,
                           ),
                           const SizedBox(
                             width: 4,
@@ -819,7 +820,7 @@ class MyItemsScreen extends StatelessWidget {
                           fontSize: 13,
                           height: 1.3,
                           color:
-                              Colors.grey.shade600,
+                              AppColors.secondaryText,
                         ),
                       ),
                     ],
@@ -957,7 +958,7 @@ class MyItemsScreen extends StatelessWidget {
         ),
         decoration:
             BoxDecoration(
-          color: Colors.green.shade50,
+          color: AppColors.successSoft,
           borderRadius:
               BorderRadius.circular(20),
         ),
@@ -968,7 +969,7 @@ class MyItemsScreen extends StatelessWidget {
             fontWeight:
                 FontWeight.bold,
             color:
-                Colors.green.shade800,
+                AppColors.success,
           ),
         ),
       );
@@ -983,7 +984,7 @@ class MyItemsScreen extends StatelessWidget {
         ),
         decoration:
             BoxDecoration(
-          color: Colors.orange.shade50,
+          color: AppColors.warningSoft,
           borderRadius:
               BorderRadius.circular(20),
         ),
@@ -994,7 +995,7 @@ class MyItemsScreen extends StatelessWidget {
             fontWeight:
                 FontWeight.bold,
             color:
-                Colors.orange.shade800,
+                AppColors.warning,
           ),
         ),
       );
@@ -1012,8 +1013,8 @@ class MyItemsScreen extends StatelessWidget {
       decoration:
           BoxDecoration(
         color: isLost
-            ? Colors.orange.shade50
-            : Colors.green.shade50,
+            ? AppColors.warningSoft
+            : AppColors.successSoft,
         borderRadius:
             BorderRadius.circular(20),
       ),
@@ -1024,8 +1025,8 @@ class MyItemsScreen extends StatelessWidget {
           fontWeight:
               FontWeight.bold,
           color: isLost
-              ? Colors.orange.shade800
-              : Colors.green.shade800,
+              ? AppColors.warning
+              : AppColors.success,
         ),
       ),
     );
@@ -1079,8 +1080,8 @@ class MyItemsScreen extends StatelessWidget {
       height: 90,
       decoration: BoxDecoration(
         color: isCompleted
-            ? Colors.green.shade50
-            : Colors.grey.shade100,
+            ? AppColors.successSoft
+            : AppColors.card,
         borderRadius:
             BorderRadius.circular(14),
       ),
@@ -1090,8 +1091,8 @@ class MyItemsScreen extends StatelessWidget {
             : Icons.image_outlined,
         size: 38,
         color: isCompleted
-            ? Colors.green.shade500
-            : Colors.grey.shade500,
+            ? AppColors.mutedText
+            : AppColors.secondaryText,
       ),
     );
   }
@@ -1113,7 +1114,7 @@ class MyItemsScreen extends StatelessWidget {
               Icons.inventory_2_outlined,
               size: 64,
               color:
-                  Colors.grey.shade400,
+                  AppColors.secondaryText,
             ),
             const SizedBox(
               height: 16,
@@ -1136,7 +1137,7 @@ class MyItemsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 color:
-                    Colors.grey.shade600,
+                    AppColors.secondaryText,
               ),
             ),
           ],
@@ -1163,7 +1164,7 @@ class MyItemsScreen extends StatelessWidget {
                   .account_circle_outlined,
               size: 64,
               color:
-                  Colors.grey.shade400,
+                  AppColors.secondaryText,
             ),
             const SizedBox(
               height: 16,
@@ -1185,7 +1186,7 @@ class MyItemsScreen extends StatelessWidget {
                   TextAlign.center,
               style: TextStyle(
                 color:
-                    Colors.grey.shade600,
+                    AppColors.secondaryText,
               ),
             ),
           ],
@@ -1212,7 +1213,7 @@ class MyItemsScreen extends StatelessWidget {
                   .error_outline_rounded,
               size: 60,
               color:
-                  Colors.red.shade400,
+                  AppColors.error,
             ),
             const SizedBox(
               height: 16,
@@ -1236,7 +1237,7 @@ class MyItemsScreen extends StatelessWidget {
                   TextAlign.center,
               style: TextStyle(
                 color:
-                    Colors.grey.shade600,
+                    AppColors.secondaryText,
               ),
             ),
           ],

@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class SearchFilterScreen extends StatefulWidget {
@@ -112,7 +113,7 @@ class _SearchFilterScreenState
               'the items you are looking for.',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade600,
+                color: AppColors.secondaryText,
                 height: 1.4,
               ),
             ),
@@ -155,7 +156,7 @@ class _SearchFilterScreenState
                   borderRadius:
                       BorderRadius.circular(14),
                   borderSide: BorderSide(
-                    color: Colors.grey.shade300,
+                    color: AppColors.border,
                   ),
                 ),
 
@@ -164,7 +165,7 @@ class _SearchFilterScreenState
                   borderRadius:
                       BorderRadius.circular(14),
                   borderSide: BorderSide(
-                    color: Colors.teal.shade700,
+                    color: AppColors.primaryBlue,
                     width: 2,
                   ),
                 ),
@@ -207,7 +208,7 @@ class _SearchFilterScreenState
                   borderRadius:
                       BorderRadius.circular(14),
                   borderSide: BorderSide(
-                    color: Colors.grey.shade300,
+                    color: AppColors.border,
                   ),
                 ),
 
@@ -216,7 +217,7 @@ class _SearchFilterScreenState
                   borderRadius:
                       BorderRadius.circular(14),
                   borderSide: BorderSide(
-                    color: Colors.teal.shade700,
+                    color: AppColors.primaryBlue,
                     width: 2,
                   ),
                 ),
@@ -249,11 +250,11 @@ class _SearchFilterScreenState
               padding: const EdgeInsets.all(16),
 
               decoration: BoxDecoration(
-                color: Colors.teal.shade50,
+                color: AppColors.blueSoft,
                 borderRadius:
                     BorderRadius.circular(14),
                 border: Border.all(
-                  color: Colors.teal.shade100,
+                  color: AppColors.blueSoft,
                 ),
               ),
 
@@ -264,7 +265,7 @@ class _SearchFilterScreenState
                 children: [
                   Icon(
                     Icons.info_outline,
-                    color: Colors.teal.shade700,
+                    color: AppColors.primaryBlue,
                   ),
 
                   const SizedBox(width: 12),
@@ -277,7 +278,7 @@ class _SearchFilterScreenState
                       style: TextStyle(
                         fontSize: 14,
                         height: 1.4,
-                        color: Colors.teal.shade900,
+                        color: AppColors.primaryBlue,
                       ),
                     ),
                   ),
@@ -313,7 +314,7 @@ class _SearchFilterScreenState
                 style:
                     ElevatedButton.styleFrom(
                   backgroundColor:
-                      Colors.teal.shade700,
+                      AppColors.primaryBlue,
                   foregroundColor: Colors.white,
 
                   shape: RoundedRectangleBorder(

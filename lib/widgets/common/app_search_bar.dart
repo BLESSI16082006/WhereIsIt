@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class AppSearchBar extends StatefulWidget {
@@ -43,10 +44,10 @@ class _AppSearchBarState extends State<AppSearchBar> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.border,
         ),
       ),
       child: TextField(
@@ -59,12 +60,12 @@ class _AppSearchBarState extends State<AppSearchBar> {
         decoration: InputDecoration(
           hintText: widget.hintText,
           hintStyle: TextStyle(
-            color: Colors.grey.shade500,
+            color: AppColors.secondaryText,
           ),
 
           prefixIcon: Icon(
             Icons.search_rounded,
-            color: Colors.grey.shade600,
+            color: AppColors.secondaryText,
           ),
 
           suffixIcon: _controller.text.isNotEmpty
@@ -73,7 +74,7 @@ class _AppSearchBarState extends State<AppSearchBar> {
                   onPressed: _clearSearch,
                   icon: Icon(
                     Icons.clear_rounded,
-                    color: Colors.grey.shade600,
+                    color: AppColors.secondaryText,
                   ),
                 )
               : null,

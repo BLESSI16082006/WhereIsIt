@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +21,9 @@ class _AdminLostPostsScreenState
 
   String _searchText = '';
 
-  static const Color primaryColor = Color(0xFF111111);
-  static const Color accentColor = Color(0xFF00A6A6);
-  static const Color backgroundColor = Color(0xFFF5F5F5);
+  static const Color primaryColor = AppColors.primaryBlue;
+  static const Color accentColor = AppColors.primaryBlue;
+  static const Color backgroundColor = AppColors.background;
 
   @override
   void initState() {
@@ -121,7 +122,7 @@ class _AdminLostPostsScreenState
   Widget _buildSearchBar() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -137,7 +138,7 @@ class _AdminLostPostsScreenState
           hintText:
               'Search by item, category, location or contact',
           hintStyle: TextStyle(
-            color: Colors.grey.shade500,
+            color: AppColors.secondaryText,
             fontSize: 13,
           ),
           prefixIcon: const Icon(
@@ -212,7 +213,7 @@ class _AdminLostPostsScreenState
         bottom: 14,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -265,7 +266,7 @@ class _AdminLostPostsScreenState
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.green
+                              color: AppColors.success
                                   .withOpacity(0.12),
                               borderRadius:
                                   BorderRadius.circular(8),
@@ -274,7 +275,7 @@ class _AdminLostPostsScreenState
                               'COMPLETED',
                               style: TextStyle(
                                 color:
-                                    Colors.green.shade700,
+                                    AppColors.success,
                                 fontSize: 8,
                                 fontWeight:
                                     FontWeight.bold,
@@ -300,7 +301,7 @@ class _AdminLostPostsScreenState
                         Icon(
                           Icons.location_on_outlined,
                           size: 15,
-                          color: Colors.grey.shade600,
+                          color: AppColors.secondaryText,
                         ),
                         const SizedBox(width: 4),
                         Expanded(
@@ -310,7 +311,7 @@ class _AdminLostPostsScreenState
                             overflow:
                                 TextOverflow.ellipsis,
                             style: TextStyle(
-                              color: Colors.grey.shade600,
+                              color: AppColors.secondaryText,
                               fontSize: 12,
                             ),
                           ),
@@ -323,13 +324,13 @@ class _AdminLostPostsScreenState
                         Icon(
                           Icons.calendar_today_outlined,
                           size: 14,
-                          color: Colors.grey.shade500,
+                          color: AppColors.secondaryText,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           date,
                           style: TextStyle(
-                            color: Colors.grey.shade500,
+                            color: AppColors.secondaryText,
                             fontSize: 12,
                           ),
                         ),
@@ -342,7 +343,7 @@ class _AdminLostPostsScreenState
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 16,
-                color: Colors.grey.shade400,
+                color: AppColors.secondaryText,
               ),
             ],
           ),
@@ -421,7 +422,7 @@ class _AdminLostPostsScreenState
             child: Text(
               label,
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: AppColors.secondaryText,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
@@ -527,7 +528,7 @@ class _AdminLostPostsScreenState
                         child: Text(
                           'Lost Post Details',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.card,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -602,7 +603,7 @@ class _AdminLostPostsScreenState
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.orange
+                            color: AppColors.warning
                                 .withOpacity(0.12),
                             borderRadius:
                                 BorderRadius.circular(10),
@@ -611,7 +612,7 @@ class _AdminLostPostsScreenState
                             'LOST ITEM',
                             style: TextStyle(
                               color:
-                                  Colors.orange.shade800,
+                                  AppColors.warning,
                               fontSize: 10,
                               fontWeight:
                                   FontWeight.bold,
@@ -688,7 +689,7 @@ class _AdminLostPostsScreenState
                               const EdgeInsets.all(14),
                           decoration: BoxDecoration(
                             color:
-                                Colors.grey.shade100,
+                                AppColors.card,
                             borderRadius:
                                 BorderRadius.circular(
                               14,
@@ -700,7 +701,7 @@ class _AdminLostPostsScreenState
                                 : description,
                             style: TextStyle(
                               color:
-                                  Colors.grey.shade800,
+                                  AppColors.primaryText,
                               fontSize: 13.5,
                               height: 1.5,
                             ),
@@ -720,7 +721,7 @@ class _AdminLostPostsScreenState
                           'Post ID: $postId',
                           style: TextStyle(
                             color:
-                                Colors.grey.shade700,
+                                AppColors.primaryText,
                             fontSize: 12,
                           ),
                         ),
@@ -729,7 +730,7 @@ class _AdminLostPostsScreenState
                           'User ID: $userId',
                           style: TextStyle(
                             color:
-                                Colors.grey.shade700,
+                                AppColors.primaryText,
                             fontSize: 12,
                           ),
                         ),
@@ -798,7 +799,7 @@ class _AdminLostPostsScreenState
                           style:
                               ElevatedButton.styleFrom(
                             backgroundColor:
-                                Colors.red.shade700,
+                                AppColors.error,
                             foregroundColor:
                                 Colors.white,
                             padding:
@@ -868,7 +869,7 @@ class _AdminLostPostsScreenState
                       child: Center(
                         child: Icon(
                           Icons.broken_image_outlined,
-                          color: Colors.white,
+                          color: AppColors.card,
                           size: 50,
                         ),
                       ),
@@ -945,7 +946,7 @@ class _AdminLostPostsScreenState
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor:
-                    Colors.red.shade700,
+                    AppColors.error,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Delete'),
@@ -1042,7 +1043,7 @@ class _AdminLostPostsScreenState
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: AppColors.secondaryText,
                 fontSize: 13,
                 height: 1.4,
               ),
@@ -1065,7 +1066,7 @@ class _AdminLostPostsScreenState
               isError
                   ? Icons.error_outline
                   : Icons.check_circle_outline,
-              color: Colors.white,
+              color: AppColors.card,
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -1074,8 +1075,8 @@ class _AdminLostPostsScreenState
           ],
         ),
         backgroundColor: isError
-            ? Colors.red.shade700
-            : Colors.green.shade700,
+            ? AppColors.error
+            : AppColors.success,
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
         shape: RoundedRectangleBorder(
@@ -1127,7 +1128,7 @@ class _AdminLostPostsScreenState
                 Text(
                   'View and manage all reported lost items.',
                   style: TextStyle(
-                    color: Colors.white70,
+                    color: AppColors.secondaryText,
                     fontSize: 13,
                   ),
                 ),

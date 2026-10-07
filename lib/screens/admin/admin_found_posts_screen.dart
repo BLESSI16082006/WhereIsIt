@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -144,7 +145,7 @@ class _AdminFoundPostsScreenState
                 Navigator.pop(dialogContext, true);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade700,
+                backgroundColor: AppColors.error,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Delete'),
@@ -171,7 +172,7 @@ class _AdminFoundPostsScreenState
           content: Text(
             'Found post deleted successfully.',
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -185,7 +186,7 @@ class _AdminFoundPostsScreenState
                 ? 'Permission denied. Update Firestore rules for admin deletion.'
                 : 'Unable to delete the post.',
           ),
-          backgroundColor: Colors.red.shade700,
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -197,7 +198,7 @@ class _AdminFoundPostsScreenState
           content: Text(
             'Unable to delete the post.',
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -412,7 +413,7 @@ class _AdminFoundPostsScreenState
                             return Container(
                               height: 220,
                               color:
-                                  Colors.grey.shade200,
+                                  AppColors.border,
                               child:
                                   const Icon(
                                 Icons
@@ -431,7 +432,7 @@ class _AdminFoundPostsScreenState
                       decoration:
                           BoxDecoration(
                         color:
-                            Colors.grey.shade100,
+                            AppColors.card,
                         borderRadius:
                             BorderRadius.circular(
                           16,
@@ -445,7 +446,7 @@ class _AdminFoundPostsScreenState
                             Icons
                                 .image_not_supported_outlined,
                             size: 45,
-                            color: Colors.grey,
+                            color: AppColors.secondaryText,
                           ),
                           SizedBox(height: 8),
                           Text(
@@ -534,7 +535,7 @@ class _AdminFoundPostsScreenState
                     decoration:
                         BoxDecoration(
                       color:
-                          Colors.grey.shade100,
+                          AppColors.card,
                       borderRadius:
                           BorderRadius.circular(
                         14,
@@ -567,7 +568,7 @@ class _AdminFoundPostsScreenState
                     style: TextStyle(
                       fontSize: 12,
                       color:
-                          Colors.grey.shade700,
+                          AppColors.primaryText,
                     ),
                   ),
 
@@ -597,7 +598,7 @@ class _AdminFoundPostsScreenState
                       style:
                           ElevatedButton.styleFrom(
                         backgroundColor:
-                            Colors.red.shade700,
+                            AppColors.error,
                         foregroundColor:
                             Colors.white,
                         shape:
@@ -636,7 +637,7 @@ class _AdminFoundPostsScreenState
               label,
               style: TextStyle(
                 color:
-                    Colors.grey.shade600,
+                    AppColors.secondaryText,
                 fontSize: 13,
                 fontWeight:
                     FontWeight.w600,
@@ -763,7 +764,7 @@ class _AdminFoundPostsScreenState
                       category,
                       style: TextStyle(
                         color:
-                            Colors.grey.shade700,
+                            AppColors.primaryText,
                         fontSize: 13,
                       ),
                     ),
@@ -777,7 +778,7 @@ class _AdminFoundPostsScreenState
                               .location_on_outlined,
                           size: 15,
                           color:
-                              Colors.grey.shade600,
+                              AppColors.secondaryText,
                         ),
                         const SizedBox(width: 3),
                         Expanded(
@@ -802,7 +803,7 @@ class _AdminFoundPostsScreenState
                       'Found: $date',
                       style: TextStyle(
                         color:
-                            Colors.grey.shade600,
+                            AppColors.secondaryText,
                         fontSize: 12,
                       ),
                     ),
@@ -845,7 +846,7 @@ class _AdminFoundPostsScreenState
                 Icons
                     .arrow_forward_ios_rounded,
                 size: 16,
-                color: Colors.grey,
+                color: AppColors.secondaryText,
               ),
             ],
           ),
@@ -858,10 +859,10 @@ class _AdminFoundPostsScreenState
     return Container(
       width: 82,
       height: 82,
-      color: Colors.grey.shade100,
+      color: AppColors.card,
       child: const Icon(
         Icons.inventory_2_outlined,
-        color: Colors.grey,
+        color: AppColors.secondaryText,
         size: 34,
       ),
     );
@@ -871,11 +872,11 @@ class _AdminFoundPostsScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-          const Color(0xFFF5F5F5),
+          AppColors.background,
 
       appBar: AppBar(
         backgroundColor:
-            const Color(0xFF111111),
+            AppColors.background,
         foregroundColor: Colors.white,
         title: const Text(
           'Found Posts',
@@ -895,7 +896,7 @@ class _AdminFoundPostsScreenState
               16,
               12,
             ),
-            color: Colors.white,
+            color: AppColors.card,
             child: TextField(
               controller:
                   _searchController,
@@ -922,7 +923,7 @@ class _AdminFoundPostsScreenState
                         : null,
                 filled: true,
                 fillColor:
-                    Colors.grey.shade100,
+                    AppColors.card,
                 border:
                     OutlineInputBorder(
                   borderRadius:

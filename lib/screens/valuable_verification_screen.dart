@@ -1,3 +1,4 @@
+import '../core/theme/app_colors.dart';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -335,7 +336,7 @@ class _ValuableVerificationScreenState
                 children: [
                   Icon(
                     Icons.verified,
-                    color: Colors.green,
+                    color: AppColors.success,
                   ),
                   SizedBox(width: 10),
                   Expanded(
@@ -392,7 +393,7 @@ class _ValuableVerificationScreenState
                 children: [
                   Icon(
                     Icons.warning_amber_rounded,
-                    color: Colors.orange,
+                    color: AppColors.warning,
                   ),
                   SizedBox(width: 10),
                   Expanded(
@@ -432,7 +433,7 @@ class _ValuableVerificationScreenState
             'Verification error: $e',
           ),
           backgroundColor:
-              Colors.red.shade700,
+              AppColors.error,
         ),
       );
     } finally {
@@ -502,14 +503,14 @@ class _ValuableVerificationScreenState
                     const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color:
-                      Colors.blue.shade50,
+                      AppColors.blueSoft,
                   borderRadius:
                       BorderRadius.circular(
                     16,
                   ),
                   border: Border.all(
                     color:
-                        Colors.blue.shade100,
+                        AppColors.blueSoft,
                   ),
                 ),
                 child: Row(
@@ -519,7 +520,7 @@ class _ValuableVerificationScreenState
                     Icon(
                       Icons.info_outline,
                       color:
-                          Colors.blue.shade700,
+                          AppColors.primaryBlue,
                     ),
                     const SizedBox(
                       width: 12,
@@ -533,7 +534,7 @@ class _ValuableVerificationScreenState
                           fontSize: 14,
                           height: 1.4,
                           color:
-                              Colors.blue.shade900,
+                              AppColors.primaryBlue,
                         ),
                       ),
                     ),
@@ -575,7 +576,7 @@ class _ValuableVerificationScreenState
                         borderSide:
                             BorderSide(
                           color:
-                              Colors.teal.shade600,
+                              AppColors.primaryBlue,
                           width: 2,
                         ),
                       ),
@@ -633,7 +634,7 @@ class _ValuableVerificationScreenState
                   style: TextStyle(
                     fontSize: 12,
                     color:
-                        Colors.grey.shade600,
+                        AppColors.secondaryText,
                   ),
                 ),
               ),

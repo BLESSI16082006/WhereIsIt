@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -28,12 +29,12 @@ class AboutScreen extends StatelessWidget {
               height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.teal.shade50,
+                color: AppColors.blueSoft,
               ),
               child: Icon(
                 Icons.search_rounded,
                 size: 58,
-                color: Colors.teal.shade700,
+                color: AppColors.primaryBlue,
               ),
             ),
 
@@ -57,7 +58,7 @@ class AboutScreen extends StatelessWidget {
               'Lost & Found Service',
               style: TextStyle(
                 fontSize: 15,
-                color: Colors.grey.shade600,
+                color: AppColors.secondaryText,
               ),
             ),
 
@@ -133,7 +134,7 @@ class AboutScreen extends StatelessWidget {
               'WhereIsIt • Version 1.0.0',
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.grey.shade500,
+                color: AppColors.secondaryText,
               ),
             ),
 
@@ -157,10 +158,10 @@ class AboutScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.border,
         ),
       ),
       child: Column(
@@ -170,7 +171,7 @@ class AboutScreen extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: Colors.teal.shade700,
+                color: AppColors.primaryBlue,
                 size: 24,
               ),
               const SizedBox(width: 10),
@@ -193,7 +194,7 @@ class AboutScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               height: 1.5,
-              color: Colors.grey.shade700,
+              color: AppColors.primaryText,
             ),
           ),
         ],

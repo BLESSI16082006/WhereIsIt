@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,10 +22,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   bool _obscurePassword = true;
   bool _isLoading = false;
 
-  static const Color primaryColor = Color(0xFF111111);
-  static const Color accentColor = Color(0xFF00A6A6);
-  static const Color backgroundColor = Color(0xFFF5F5F5);
-  static const Color fieldColor = Colors.white;
+  static const Color primaryColor = AppColors.background;
+  static const Color accentColor = AppColors.primaryBlue;
+  static const Color backgroundColor = AppColors.background;
+  static const Color fieldColor = AppColors.card;
 
   @override
   void dispose() {
@@ -200,7 +201,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
           ],
         ),
         backgroundColor:
-            isError ? Colors.red.shade700 : Colors.green.shade700,
+            isError ? AppColors.error : AppColors.success,
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
         shape: RoundedRectangleBorder(
@@ -242,7 +243,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         keyboardType: keyboardType,
         validator: validator,
         style: const TextStyle(
-          color: primaryColor,
+          color: AppColors.primaryText,
           fontSize: 16,
           fontWeight: FontWeight.w500,
         ),
@@ -262,10 +263,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
           ),
           suffixIcon: suffixIcon,
           labelStyle: TextStyle(
-            color: Colors.grey.shade600,
+            color: AppColors.secondaryText,
           ),
           hintStyle: TextStyle(
-            color: Colors.grey.shade400,
+            color: AppColors.secondaryText,
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
@@ -285,13 +286,13 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: const BorderSide(
-              color: Colors.red,
+              color: AppColors.error,
             ),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: const BorderSide(
-              color: Colors.red,
+              color: AppColors.error,
               width: 2,
             ),
           ),
@@ -329,7 +330,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   35,
                 ),
                 decoration: const BoxDecoration(
-                  color: primaryColor,
+                  color: AppColors.background,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(35),
                     bottomRight: Radius.circular(35),
@@ -345,7 +346,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         },
                         icon: const Icon(
                           Icons.arrow_back,
-                          color: Colors.white,
+                          color: AppColors.card,
                           size: 28,
                         ),
                       ),
@@ -359,7 +360,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.white,
+                          color: AppColors.card,
                           width: 4,
                         ),
                       ),
@@ -386,7 +387,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     Text(
                       'WhereIsIt Administration',
                       style: TextStyle(
-                        color: Colors.grey.shade300,
+                        color: AppColors.border,
                         fontSize: 15,
                       ),
                     ),
@@ -456,7 +457,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                             _obscurePassword
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
-                            color: Colors.grey.shade600,
+                            color: AppColors.secondaryText,
                           ),
                         ),
                         validator: (value) {
@@ -541,12 +542,12 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color:
-                              Colors.orange.withOpacity(0.08),
+                              AppColors.warningSoft,
                           borderRadius:
                               BorderRadius.circular(16),
                           border: Border.all(
                             color:
-                                Colors.orange.withOpacity(0.35),
+                                AppColors.warningBorder,
                           ),
                         ),
                         child: Row(
@@ -555,7 +556,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                           children: [
                             Icon(
                               Icons.security_outlined,
-                              color: Colors.orange.shade800,
+                              color: AppColors.warning,
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -564,7 +565,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                                 'Only authorized administrators can access '
                                 'the management panel.',
                                 style: TextStyle(
-                                  color: Colors.grey.shade800,
+                                  color: AppColors.primaryText,
                                   fontSize: 13,
                                   height: 1.4,
                                 ),
@@ -587,7 +588,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                           Text(
                             'Are you a user? ',
                             style: TextStyle(
-                              color: Colors.grey.shade700,
+                              color: AppColors.primaryText,
                               fontSize: 15,
                             ),
                           ),

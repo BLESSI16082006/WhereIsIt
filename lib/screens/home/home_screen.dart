@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -374,7 +375,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     'Search recent lost and found posts.',
                     style: TextStyle(
                       fontSize: 15,
-                      color: Colors.grey.shade600,
+                      color: AppColors.secondaryText,
                     ),
                   ),
 
@@ -455,7 +456,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Icons.search_off_rounded,
                                     size: 30,
                                     color:
-                                        Colors.orange.shade700,
+                                        AppColors.warning,
                                   ),
                                   const SizedBox(height: 8),
                                   const Text(
@@ -493,7 +494,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Icons.check_circle_outline,
                                     size: 30,
                                     color:
-                                        Colors.green.shade700,
+                                        AppColors.success,
                                   ),
                                   const SizedBox(height: 8),
                                   const Text(
@@ -532,7 +533,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         '${posts.length} posts',
                         style: TextStyle(
-                          color: Colors.grey.shade600,
+                          color: AppColors.secondaryText,
                         ),
                       ),
                     ],
@@ -647,7 +648,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.grey.shade100,
+        color: AppColors.card,
       ),
       child: Column(
         children: [
@@ -656,7 +657,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? Icons.search_off_rounded
                 : Icons.inventory_2_outlined,
             size: 52,
-            color: Colors.grey.shade500,
+            color: AppColors.secondaryText,
           ),
 
           const SizedBox(height: 14),
@@ -679,7 +680,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 : 'No users have created a post yet.',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.grey.shade600,
+              color: AppColors.secondaryText,
             ),
           ),
         ],
@@ -702,7 +703,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Icon(
               Icons.error_outline_rounded,
               size: 60,
-              color: Colors.red.shade400,
+              color: AppColors.error,
             ),
 
             const SizedBox(height: 16),
@@ -722,7 +723,7 @@ class _HomeScreenState extends State<HomeScreen> {
               'Please check your internet connection and try again.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: AppColors.secondaryText,
               ),
             ),
           ],

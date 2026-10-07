@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -1098,7 +1099,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                     style: TextStyle(
                       fontSize: 13,
                       color:
-                          Colors.grey.shade700,
+                          AppColors.primaryText,
                     ),
                   ),
                   const SizedBox(
@@ -1277,7 +1278,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                     style: TextStyle(
                       fontSize: 13,
                       color:
-                          Colors.grey.shade700,
+                          AppColors.primaryText,
                     ),
                   ),
                   const SizedBox(
@@ -1446,7 +1447,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
         return AlertDialog(
           icon: Icon(
             Icons.error_outline_rounded,
-            color: Colors.red.shade600,
+            color: AppColors.error,
             size: 42,
           ),
           title: const Text(
@@ -1680,8 +1681,8 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
 
     final Color statusColor =
         isFound
-            ? Colors.green.shade700
-            : Colors.orange.shade700;
+            ? AppColors.success
+            : AppColors.warning;
 
     return Container(
       width: double.infinity,
@@ -1763,7 +1764,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               style: TextStyle(
                 fontSize: 14,
                 color:
-                    Colors.grey.shade700,
+                    AppColors.primaryText,
                 fontWeight:
                     FontWeight.w600,
               ),
@@ -1798,10 +1799,10 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       ),
       decoration: BoxDecoration(
         color: verified
-            ? Colors.green.withValues(
+            ? AppColors.success.withValues(
                 alpha: 0.10,
               )
-            : Colors.orange.withValues(
+            : AppColors.warning.withValues(
                 alpha: 0.10,
               ),
         borderRadius:
@@ -1817,8 +1818,8 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                 : Icons.lock_outline,
             size: 17,
             color: verified
-                ? Colors.green.shade700
-                : Colors.orange.shade700,
+                ? AppColors.success
+                : AppColors.warning,
           ),
           const SizedBox(
             width: 6,
@@ -1832,8 +1833,8 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               fontWeight:
                   FontWeight.w700,
               color: verified
-                  ? Colors.green.shade700
-                  : Colors.orange.shade700,
+                  ? AppColors.success
+                  : AppColors.warning,
             ),
           ),
         ],
@@ -1881,7 +1882,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               'Reward',
               '₹$_reward',
               valueColor:
-                  Colors.green.shade700,
+                  AppColors.success,
             ),
         ],
       ),
@@ -1938,7 +1939,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
           fontSize: 14,
           height: 1.5,
           color:
-              Colors.grey.shade800,
+              AppColors.primaryText,
         ),
       ),
     );
@@ -1976,7 +1977,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               'No contact information available.',
               style: TextStyle(
                 color:
-                    Colors.grey.shade600,
+                    AppColors.secondaryText,
               ),
             ),
         ],
@@ -1994,11 +1995,11 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       padding:
           const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.orange.shade50,
+        color: AppColors.warningSoft,
         borderRadius:
             BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.orange.shade200,
+          color: AppColors.warningBorder,
         ),
       ),
       child: Column(
@@ -2007,7 +2008,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
             Icons
                 .admin_panel_settings_outlined,
             size: 52,
-            color: Colors.orange.shade700,
+            color: AppColors.warning,
           ),
 
           const SizedBox(
@@ -2037,7 +2038,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               fontSize: 14,
               height: 1.45,
               color:
-                  Colors.grey.shade700,
+                  AppColors.primaryText,
             ),
           ),
 
@@ -2050,7 +2051,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
             padding:
                 const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.card,
               borderRadius:
                   BorderRadius.circular(
                 12,
@@ -2062,7 +2063,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               children: [
                 Icon(
                   Icons.verified_user_outlined,
-                  color: Colors.teal,
+                  color: AppColors.primaryBlue,
                 ),
                 SizedBox(
                   width: 10,
@@ -2102,11 +2103,11 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       padding:
           const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.teal.shade50,
+        color: AppColors.blueSoft,
         borderRadius:
             BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.teal.shade200,
+          color: AppColors.blueBorder,
         ),
       ),
       child: Column(
@@ -2118,7 +2119,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               Icon(
                 Icons.verified_user_outlined,
                 color:
-                    Colors.teal.shade700,
+                    AppColors.primaryBlue,
               ),
               const SizedBox(
                 width: 9,
@@ -2146,7 +2147,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               fontSize: 13,
               height: 1.4,
               color:
-                  Colors.grey.shade700,
+                  AppColors.primaryText,
             ),
           ),
 
@@ -2159,7 +2160,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
             padding:
                 const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.card,
               borderRadius:
                   BorderRadius.circular(
                 10,
@@ -2174,8 +2175,8 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                 fontWeight:
                     FontWeight.w700,
                 color: attemptsAvailable
-                    ? Colors.teal.shade800
-                    : Colors.red.shade700,
+                    ? AppColors.primaryBlue
+                    : AppColors.error,
               ),
             ),
           ),
@@ -2215,8 +2216,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                         CircleAvatar(
                       radius: 12,
                       backgroundColor:
-                          Colors.teal
-                              .shade100,
+                          AppColors.blueSoft,
                       child: Text(
                         '${index + 1}',
                         style:
@@ -2303,11 +2303,11 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       padding:
           const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.green.shade50,
+        color: AppColors.successSoft,
         borderRadius:
             BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.green.shade200,
+          color: AppColors.successBorder,
         ),
       ),
       child: Column(
@@ -2319,7 +2319,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               Icon(
                 Icons.verified,
                 color:
-                    Colors.green.shade700,
+                    AppColors.success,
               ),
               const SizedBox(
                 width: 8,
@@ -2347,7 +2347,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               fontSize: 13,
               height: 1.4,
               color:
-                  Colors.grey.shade700,
+                  AppColors.primaryText,
             ),
           ),
 
@@ -2440,14 +2440,14 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.teal.shade50,
-            Colors.blue.shade50,
+            AppColors.blueSoft,
+            AppColors.blueSoft,
           ],
         ),
         borderRadius:
             BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.teal.shade200,
+          color: AppColors.blueBorder,
         ),
       ),
       child: Column(
@@ -2459,7 +2459,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               Icon(
                 Icons.local_shipping_outlined,
                 color:
-                    Colors.teal.shade700,
+                    AppColors.primaryBlue,
               ),
               const SizedBox(
                 width: 9,
@@ -2487,7 +2487,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               fontSize: 13,
               height: 1.45,
               color:
-                  Colors.grey.shade700,
+                  AppColors.primaryText,
             ),
           ),
 
@@ -2511,7 +2511,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                           CircularProgressIndicator(
                         strokeWidth: 2,
                         color:
-                            Colors.white,
+                            AppColors.card,
                       ),
                     )
                   : const Icon(
@@ -2599,11 +2599,11 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       padding:
           const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: AppColors.blueSoft,
         borderRadius:
             BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.blue.shade200,
+          color: AppColors.blueBorder,
         ),
       ),
       child: Column(
@@ -2615,7 +2615,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               Icon(
                 Icons.sync_alt_rounded,
                 color:
-                    Colors.blue.shade700,
+                    AppColors.primaryBlue,
               ),
               const SizedBox(
                 width: 9,
@@ -2643,7 +2643,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               fontSize: 13,
               height: 1.45,
               color:
-                  Colors.grey.shade700,
+                  AppColors.primaryText,
             ),
           ),
 
@@ -2717,13 +2717,13 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
         vertical: 10,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card,
         borderRadius:
             BorderRadius.circular(12),
         border: Border.all(
           color: confirmed
-              ? Colors.green.shade200
-              : Colors.grey.shade200,
+              ? AppColors.successBorder
+              : AppColors.border,
         ),
       ),
       child: Row(
@@ -2732,8 +2732,8 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
             icon,
             size: 20,
             color: confirmed
-                ? Colors.green.shade700
-                : Colors.grey.shade600,
+                ? AppColors.success
+                : AppColors.secondaryText,
           ),
           const SizedBox(
             width: 9,
@@ -2753,8 +2753,8 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                 : Icons.schedule,
             size: 19,
             color: confirmed
-                ? Colors.green.shade700
-                : Colors.orange.shade700,
+                ? AppColors.success
+                : AppColors.warning,
           ),
           const SizedBox(
             width: 5,
@@ -2768,8 +2768,8 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               fontWeight:
                   FontWeight.w700,
               color: confirmed
-                  ? Colors.green.shade700
-                  : Colors.orange.shade700,
+                  ? AppColors.success
+                  : AppColors.warning,
             ),
           ),
         ],
@@ -2787,11 +2787,11 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       padding:
           const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.green.shade50,
+        color: AppColors.successSoft,
         borderRadius:
             BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.green.shade200,
+          color: AppColors.successBorder,
         ),
       ),
       child: Row(
@@ -2802,7 +2802,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
             Icons.check_circle_outline,
             size: 34,
             color:
-                Colors.green.shade700,
+                AppColors.success,
           ),
           const SizedBox(
             width: 12,
@@ -2856,13 +2856,13 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       padding:
           const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card,
         borderRadius:
             BorderRadius.circular(
           12,
         ),
         border: Border.all(
-          color: Colors.green.shade100,
+          color: AppColors.successSoftStrong,
         ),
       ),
       child: Row(
@@ -2873,7 +2873,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
             icon,
             size: 20,
             color:
-                Colors.green.shade700,
+                AppColors.success,
           ),
           const SizedBox(
             width: 10,
@@ -2890,7 +2890,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                     fontWeight:
                         FontWeight.bold,
                     color:
-                        Colors.grey.shade600,
+                        AppColors.secondaryText,
                   ),
                 ),
                 const SizedBox(
@@ -2924,11 +2924,11 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       padding:
           const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card,
         borderRadius:
             BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.border,
         ),
         boxShadow: [
           BoxShadow(
@@ -2949,7 +2949,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               Icon(
                 icon,
                 color:
-                    Colors.teal.shade700,
+                    AppColors.primaryBlue,
               ),
               const SizedBox(
                 width: 8,
@@ -3001,7 +3001,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
             icon,
             size: 19,
             color:
-                Colors.grey.shade600,
+                AppColors.secondaryText,
           ),
           const SizedBox(
             width: 10,
@@ -3015,7 +3015,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                 fontWeight:
                     FontWeight.w600,
                 color:
-                    Colors.grey.shade600,
+                    AppColors.secondaryText,
               ),
             ),
           ),
@@ -3027,7 +3027,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                 fontWeight:
                     FontWeight.w600,
                 color: valueColor ??
-                    Colors.grey.shade900,
+                    AppColors.primaryText,
               ),
             ),
           ),
@@ -3047,14 +3047,14 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       width: double.infinity,
       height: height,
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: AppColors.card,
         borderRadius:
             BorderRadius.circular(14),
       ),
       child: Icon(
         Icons.image_outlined,
         size: 50,
-        color: Colors.grey.shade500,
+        color: AppColors.secondaryText,
       ),
     );
   }

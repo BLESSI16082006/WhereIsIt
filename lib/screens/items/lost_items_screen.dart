@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -171,7 +172,7 @@ class LostItemsScreen extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.orange.shade50,
+                            color: AppColors.warningSoft,
                             borderRadius:
                                 BorderRadius.circular(20),
                           ),
@@ -180,7 +181,7 @@ class LostItemsScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
-                              color: Colors.orange.shade800,
+                              color: AppColors.warning,
                             ),
                           ),
                         ),
@@ -194,7 +195,7 @@ class LostItemsScreen extends StatelessWidget {
                         category,
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.grey.shade600,
+                          color: AppColors.secondaryText,
                         ),
                       ),
 
@@ -205,7 +206,7 @@ class LostItemsScreen extends StatelessWidget {
                           Icon(
                             Icons.location_on_outlined,
                             size: 16,
-                            color: Colors.grey.shade600,
+                            color: AppColors.secondaryText,
                           ),
                           const SizedBox(width: 4),
                           Expanded(
@@ -214,7 +215,7 @@ class LostItemsScreen extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey.shade700,
+                                color: AppColors.primaryText,
                               ),
                             ),
                           ),
@@ -231,7 +232,7 @@ class LostItemsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           height: 1.3,
-                          color: Colors.grey.shade600,
+                          color: AppColors.secondaryText,
                         ),
                       ),
                     ],
@@ -247,14 +248,14 @@ class LostItemsScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: Colors.teal.shade700,
+                            color: AppColors.primaryBlue,
                           ),
                         ),
                         const SizedBox(width: 3),
                         Icon(
                           Icons.arrow_forward_ios,
                           size: 13,
-                          color: Colors.teal.shade700,
+                          color: AppColors.primaryBlue,
                         ),
                       ],
                     ),
@@ -300,13 +301,13 @@ class LostItemsScreen extends StatelessWidget {
       width: 90,
       height: 90,
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Icon(
         Icons.image_outlined,
         size: 38,
-        color: Colors.grey.shade500,
+        color: AppColors.secondaryText,
       ),
     );
   }
@@ -325,7 +326,7 @@ class LostItemsScreen extends StatelessWidget {
             Icon(
               Icons.search_off_rounded,
               size: 64,
-              color: Colors.grey.shade400,
+              color: AppColors.secondaryText,
             ),
             const SizedBox(height: 16),
             const Text(
@@ -341,7 +342,7 @@ class LostItemsScreen extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade600,
+                color: AppColors.secondaryText,
               ),
             ),
           ],
@@ -367,7 +368,7 @@ class LostItemsScreen extends StatelessWidget {
             Icon(
               Icons.error_outline_rounded,
               size: 60,
-              color: Colors.red.shade400,
+              color: AppColors.error,
             ),
             const SizedBox(height: 16),
             const Text(
@@ -383,7 +384,7 @@ class LostItemsScreen extends StatelessWidget {
               'Please check your internet connection and try again.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: AppColors.secondaryText,
               ),
             ),
             const SizedBox(height: 18),

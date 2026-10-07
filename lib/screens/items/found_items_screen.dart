@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -214,7 +215,7 @@ class FoundItemsScreen extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.green.shade50,
+                            color: AppColors.successSoft,
                             borderRadius:
                                 BorderRadius.circular(20),
                           ),
@@ -223,7 +224,7 @@ class FoundItemsScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green.shade800,
+                              color: AppColors.success,
                             ),
                           ),
                         ),
@@ -241,7 +242,7 @@ class FoundItemsScreen extends StatelessWidget {
                         category,
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.grey.shade600,
+                          color: AppColors.secondaryText,
                         ),
                       ),
 
@@ -256,7 +257,7 @@ class FoundItemsScreen extends StatelessWidget {
                           Icon(
                             Icons.location_on_outlined,
                             size: 16,
-                            color: Colors.grey.shade600,
+                            color: AppColors.secondaryText,
                           ),
                           const SizedBox(width: 4),
                           Expanded(
@@ -267,7 +268,7 @@ class FoundItemsScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 13,
                                 color:
-                                    Colors.grey.shade700,
+                                    AppColors.primaryText,
                               ),
                             ),
                           ),
@@ -286,7 +287,7 @@ class FoundItemsScreen extends StatelessWidget {
                           Icon(
                             Icons.calendar_today_outlined,
                             size: 15,
-                            color: Colors.grey.shade600,
+                            color: AppColors.secondaryText,
                           ),
                           const SizedBox(width: 5),
                           Text(
@@ -294,7 +295,7 @@ class FoundItemsScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 13,
                               color:
-                                  Colors.grey.shade700,
+                                  AppColors.primaryText,
                             ),
                           ),
                         ],
@@ -312,7 +313,7 @@ class FoundItemsScreen extends StatelessWidget {
                           Icon(
                             Icons.card_giftcard_outlined,
                             size: 16,
-                            color: Colors.green.shade700,
+                            color: AppColors.success,
                           ),
                           const SizedBox(width: 5),
                           Text(
@@ -320,7 +321,7 @@ class FoundItemsScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: Colors.green.shade700,
+                              color: AppColors.success,
                             ),
                           ),
                         ],
@@ -341,7 +342,7 @@ class FoundItemsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           height: 1.3,
-                          color: Colors.grey.shade600,
+                          color: AppColors.secondaryText,
                         ),
                       ),
                     ],
@@ -357,7 +358,7 @@ class FoundItemsScreen extends StatelessWidget {
                           Icon(
                             Icons.lock_outline,
                             size: 15,
-                            color: Colors.orange.shade700,
+                            color: AppColors.warning,
                           ),
                           const SizedBox(width: 5),
                           Expanded(
@@ -367,7 +368,7 @@ class FoundItemsScreen extends StatelessWidget {
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color:
-                                    Colors.orange.shade700,
+                                    AppColors.warning,
                               ),
                             ),
                           ),
@@ -390,14 +391,14 @@ class FoundItemsScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: Colors.teal.shade700,
+                            color: AppColors.primaryBlue,
                           ),
                         ),
                         const SizedBox(width: 3),
                         Icon(
                           Icons.arrow_forward_ios,
                           size: 13,
-                          color: Colors.teal.shade700,
+                          color: AppColors.primaryBlue,
                         ),
                       ],
                     ),
@@ -447,13 +448,13 @@ class FoundItemsScreen extends StatelessWidget {
       width: 90,
       height: 90,
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Icon(
         Icons.image_outlined,
         size: 38,
-        color: Colors.grey.shade500,
+        color: AppColors.secondaryText,
       ),
     );
   }
@@ -499,7 +500,7 @@ class FoundItemsScreen extends StatelessWidget {
             Icon(
               Icons.search_rounded,
               size: 64,
-              color: Colors.grey.shade400,
+              color: AppColors.secondaryText,
             ),
             const SizedBox(height: 16),
             const Text(
@@ -515,7 +516,7 @@ class FoundItemsScreen extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade600,
+                color: AppColors.secondaryText,
               ),
             ),
           ],
@@ -539,7 +540,7 @@ class FoundItemsScreen extends StatelessWidget {
             Icon(
               Icons.error_outline_rounded,
               size: 60,
-              color: Colors.red.shade400,
+              color: AppColors.error,
             ),
             const SizedBox(height: 16),
             const Text(
@@ -555,7 +556,7 @@ class FoundItemsScreen extends StatelessWidget {
               'Please check your internet connection and try again.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: AppColors.secondaryText,
               ),
             ),
           ],

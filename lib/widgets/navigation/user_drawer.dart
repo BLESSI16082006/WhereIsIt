@@ -1,3 +1,4 @@
+import '../../core/theme/app_colors.dart';
 
 import 'package:flutter/material.dart';
 
@@ -11,7 +12,7 @@ class UserDrawer extends StatelessWidget {
   // ------------------------------------------------------------
 
   static const Color _darkChocolate =
-      Color(0xFF2B1712);
+      AppColors.background;
 
   // ------------------------------------------------------------
   // NAVIGATE
@@ -106,12 +107,12 @@ class UserDrawer extends StatelessWidget {
                     height: 68,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white,
+                      color: AppColors.card,
                     ),
                     child: Icon(
                       Icons.person,
                       size: 38,
-                      color: Colors.teal.shade700,
+                      color: AppColors.primaryBlue,
                     ),
                   ),
 
@@ -131,7 +132,7 @@ class UserDrawer extends StatelessWidget {
                   const Text(
                     'Lost & Found Service',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: AppColors.secondaryText,
                       fontSize: 13,
                     ),
                   ),
@@ -281,12 +282,12 @@ class UserDrawer extends StatelessWidget {
             ListTile(
               leading: Icon(
                 Icons.logout,
-                color: Colors.red.shade700,
+                color: AppColors.error,
               ),
               title: Text(
                 'Logout',
                 style: TextStyle(
-                  color: Colors.red.shade700,
+                  color: AppColors.error,
                   fontWeight: FontWeight.w600,
                 ),
               ),
